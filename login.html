@@ -3,33 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Identificare Elev</title>
+    <title>Identificare Elev - Atelier</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-color: #f8fafc; --card-bg: #ffffff; --primary: #4f46e5; --text-main: #1e293b; --text-muted: #64748b; --accent: #f1f5f9; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .app-container { width: 90%; max-width: 400px; background: var(--card-bg); padding: 40px; border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); text-align: center; }
-        h2 { margin-top: 0; color: var(--primary); }
-        input { width: 100%; padding: 14px; margin: 25px 0; border: 2px solid var(--accent); border-radius: 12px; font-size: 1rem; outline: none; transition: border-color 0.2s; text-align: center; }
-        input:focus { border-color: var(--primary); }
-        button { width: 100%; background-color: var(--primary); color: white; padding: 14px; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; }
-        button:hover { background-color: #4338ca; }
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary: #4f46e5;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent: #f1f5f9;
+        }
+
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 90%;
+            max-width: 400px;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1.6rem;
+        }
+
+        p {
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            outline: none;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            background-color: #fcfdff;
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+        }
+
+        button:hover {
+            background-color: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
     <div class="app-container">
         <h2>Cine ești?</h2>
-        <p style="color: var(--text-muted)">Introdu numele tău complet pentru a accesa foaia de test.</p>
-        <input type="text" id="nume-elev" placeholder="Nume și Prenume">
+        <p>Introdu numele tău complet pentru a accesa testul activat de profesor.</p>
+        
+        <input type="text" id="nume-elev" placeholder="Nume și Prenume" autofocus>
+        
         <button onclick="intraInTest()">ÎNCEPE TESTUL</button>
     </div>
+
     <script>
+        // Verificăm dacă există un test activ în memorie
+        const targetTest = localStorage.getItem('current_test_file');
+        if (!targetTest) {
+            // Dacă a intrat direct pe login.html fără să treacă prin index.html
+            window.location.href = 'index.html';
+        }
+
         function intraInTest() {
             const nume = document.getElementById('nume-elev').value.trim();
-            if (nume.length < 3) return alert("Te rugăm să introduci un nume valid!");
+            
+            if (nume.length < 3) {
+                alert("Te rugăm să introduci un nume valid!");
+                return;
+            }
+
+            // Salvăm numele pentru a-l afișa în foaia de test
             localStorage.setItem('elev_nume', nume);
-            window.location.href = 'test1.html';
+            
+            // Redirecționăm către fișierul ales de profesor
+            window.location.href = targetTest;
         }
+
+        // Permitem apăsarea tastei Enter pentru trimitere
+        document.getElementById('nume-elev').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                intraInTest();
+            }
+        });
     </script>
 </body>
 </html>
