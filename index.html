@@ -3,49 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atelier de Literatura - Hub</title>
+    <title>Atelier de Literatură - Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        :root { --bg-color: #f8fafc; --card-bg: #ffffff; --primary: #4f46e5; --text-main: #1e293b; --text-muted: #64748b; --accent: #f1f5f9; }
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary: #4f46e5;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent: #f1f5f9;
+        }
+
         * { box-sizing: border-box; transition: all 0.3s ease; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .app-container { width: 90%; max-width: 450px; background: var(--card-bg); padding: 50px 40px; border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); text-align: center; }
-        h1 { font-size: 1.8rem; color: var(--primary); margin: 0 0 10px 0; }
-        .subtitle { color: var(--text-muted); font-size: 1rem; margin-bottom: 30px; line-height: 1.5; }
-        .loader { border: 4px solid var(--accent); border-top: 4px solid var(--primary); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 20px auto; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 90%;
+            max-width: 450px;
+            background: var(--card-bg);
+            padding: 50px 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin: 0 0 10px 0;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .loader {
+            border: 4px solid var(--accent);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .btn-primary { display: none; background-color: var(--primary); color: white; padding: 16px 32px; border-radius: 14px; font-size: 1.1rem; font-weight: 600; text-decoration: none; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+
+        .btn-primary {
+            display: none;
+            background-color: var(--primary);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
     <div class="app-container">
         <h1 id="status-title">Conectare...</h1>
         <p id="status-desc" class="subtitle">Se verifică disponibilitatea testului pe server.</p>
+        
         <div id="loading-spinner" class="loader"></div>
+        
         <a href="login.html" id="start-btn" class="btn-primary">ACCESEAZĂ TESTUL</a>
     </div>
 
 <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyC2xOfKBy7FdA6uIyM0ij5ryHTop0yL3pg",
-      authDomain: "bacromana-6f3eb.firebaseapp.com",
-      databaseURL: "https://bacromana-6f3eb-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "bacromana-6f3eb",
-      storageBucket: "bacromana-6f3eb.firebasestorage.app",
-      messagingSenderId: "1087294677634",
-      appId: "1:1087294677634:web:d92bf75a8b58f7b351ca9b"
+        apiKey: "AIzaSyC2xOfKBy7FdA6uIyM0ij5ryHTop0yL3pg",
+        authDomain: "bacromana-6f3eb.firebaseapp.com",
+        databaseURL: "https://bacromana-6f3eb-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "bacromana-6f3eb",
+        storageBucket: "bacromana-6f3eb.firebasestorage.app",
+        messagingSenderId: "1087294677634",
+        appId: "1:1087294677634:web:d92bf75a8b58f7b351ca9b"
     };
+
     firebase.initializeApp(firebaseConfig);
-    firebase.database().ref('setari/test_activ').on('value', (snapshot) => {
-        if (snapshot.val()) {
-            document.getElementById('status-title').innerText = "Test Lansat!";
-            document.getElementById('status-desc').innerText = "Profesorul a activat testul. Poți începe acum.";
+    const database = firebase.database();
+
+    // Ascultăm schimbările de la profesor
+    database.ref('setari').on('value', (snapshot) => {
+        const data = snapshot.val();
+        
+        if (data && data.test_activ) {
+            // Testul este pornit
+            document.getElementById('status-title').innerText = "Test Disponibil!";
+            document.getElementById('status-desc').innerText = "Test activ: " + data.test_nume + ". Apasă butonul de mai jos pentru a începe.";
             document.getElementById('loading-spinner').style.display = 'none';
             document.getElementById('start-btn').style.display = 'inline-block';
+            
+            // Salvăm ID-ul testului ales de profesor în memorie pentru login.html
+            localStorage.setItem('current_test_file', data.test_id);
         } else {
+            // Testul este oprit
             document.getElementById('status-title').innerText = "Sala de Așteptare";
             document.getElementById('status-desc').innerText = "Te rugăm să aștepți ca profesorul să dea startul testului.";
             document.getElementById('loading-spinner').style.display = 'block';
