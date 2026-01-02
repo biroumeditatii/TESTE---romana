@@ -48,6 +48,7 @@
             color: var(--text-muted);
             line-height: 1.5;
             margin-bottom: 25px;
+            font-size: 0.95rem;
         }
 
         input {
@@ -91,9 +92,10 @@
     </style>
 </head>
 <body>
+
     <div class="app-container">
         <h2>Cine ești?</h2>
-        <p>Introdu numele tău complet pentru a accesa testul activat de profesor.</p>
+        <p>Introdu numele tău complet pentru a accesa testul.</p>
         
         <input type="text" id="nume-elev" placeholder="Nume și Prenume" autofocus>
         
@@ -101,29 +103,33 @@
     </div>
 
     <script>
-        // Verificăm dacă există un test activ în memorie
-        const targetTest = localStorage.getItem('current_test_file');
-        if (!targetTest) {
-            // Dacă a intrat direct pe login.html fără să treacă prin index.html
-            window.location.href = 'index.html';
-        }
-
         function intraInTest() {
-            const nume = document.getElementById('nume-elev').value.trim();
+            const numeIntrodus = document.getElementById('nume-elev').value.trim();
             
-            if (nume.length < 3) {
+            if (numeIntrodus.length < 3) {
                 alert("Te rugăm să introduci un nume valid!");
                 return;
             }
 
-            // Salvăm numele pentru a-l afișa în foaia de test
-            localStorage.setItem('elev_nume', nume);
+            // 1. Generăm un ID unic pentru a evita suprascrierea elevilor cu același nume
+            // Format: Nume_NumarAleator (ex: Andrei_4281)
+            const studentID = numeIntrodus.replace(/\s+/g, '_') + "_" + Math.floor(Math.random() * 10000);
+
+            // 2. Curățăm sesiunea anterioară de răspunsuri (pentru a fi testul gol la logare nouă)
+            sessionStorage.removeItem('elev_raspunsuri');
+
+            // 3. Salvăm datele în browser
+            localStorage.setItem('elev_nume', numeIntrodus); // Pentru afișare pe ecran
+            localStorage.setItem('student_id', studentID);   // Pentru cheia unică din Firebase
             
-            // Redirecționăm către fișierul ales de profesor
+            // 4. Preluăm fișierul testului setat de profesor din Hub (index.html)
+            const targetTest = localStorage.getItem('current_test_file') || 'test1.html';
+            
+            // 5. Redirecționăm către test
             window.location.href = targetTest;
         }
 
-        // Permitem apăsarea tastei Enter pentru trimitere
+        // Permitem logarea prin tasta Enter
         document.getElementById('nume-elev').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 intraInTest();
