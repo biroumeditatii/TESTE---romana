@@ -1,0 +1,20 @@
+<div style="background: #1e293b; padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+    <h3>Control Test</h3>
+    <button onclick="lanseazaTest(true)" style="background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;">LANSEAZĂ TESTUL</button>
+    <button onclick="lanseazaTest(false)" style="background: #ef4444; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin-left: 10px;">OPREȘTE TESTUL</button>
+    <button onclick="reseteazaClasa()" style="background: #64748b; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin-left: 10px;">Golește Lista Elevi</button>
+</div>
+
+<script>
+    // Funcțiile de control pentru profesor
+    function lanseazaTest(stare) {
+        database.ref('setari/test_activ').set(stare);
+        alert(stare ? "Testul a fost lansat!" : "Testul a fost oprit!");
+    }
+
+    function reseteazaClasa() {
+        if(confirm("Ștergi toate rezultatele actuale?")) {
+            database.ref('clasa').remove();
+        }
+    }
+</script>

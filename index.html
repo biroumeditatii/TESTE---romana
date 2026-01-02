@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atelier Literatura - Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; text-align: center; }
+        .card { background: white; padding: 40px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 400px; width: 90%; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #4f46e5; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .btn-access { display: none; background: #4f46e5; color: white; padding: 15px 30px; border-radius: 12px; text-decoration: none; font-weight: 600; margin-top: 20px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1 id="status-title">Așteptăm profesorul...</h1>
+        <p id="status-desc">Testul va apărea aici imediat ce este lansat.</p>
+        <div id="loading-spinner" class="loader"></div>
+        <a href="login.html" id="start-btn" class="btn-access">ACCESEAZĂ TESTUL</a>
+    </div>
+
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2xOfKBy7FdA6uIyM0ij5ryHTop0yL3pg",
+      authDomain: "bacromana-6f3eb.firebaseapp.com",
+      databaseURL: "https://bacromana-6f3eb-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "bacromana-6f3eb",
+      storageBucket: "bacromana-6f3eb.firebasestorage.app",
+      messagingSenderId: "1087294677634",
+      appId: "1:1087294677634:web:d92bf75a8b58f7b351ca9b"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Ascultăm starea testului
+    database.ref('setari/test_activ').on('value', (snapshot) => {
+        const isActiv = snapshot.val();
+        if (isActiv) {
+            document.getElementById('status-title').innerText = "Testul a fost lansat!";
+            document.getElementById('status-desc').innerText = "Apasă butonul de mai jos pentru a te identifica.";
+            document.getElementById('loading-spinner').style.display = 'none';
+            document.getElementById('start-btn').style.display = 'inline-block';
+        } else {
+            document.getElementById('status-title').innerText = "Așteptăm profesorul...";
+            document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('loading-spinner').style.display = 'block';
+        }
+    });
+</script>
+</body>
+</html>
