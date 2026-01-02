@@ -1,33 +1,59 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-    <link rel="manifest" href="manifest.json">
-
-    <meta name="theme-color" content="#4f46e5">
-    <meta name="mobile-web-app-capable" content="yes">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <meta charset="UTF-8">
     <title>Panou Profesor - Control & Monitorizare</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    
     <style>
         :root { 
             --bg-color: #f1f5f9; 
             --card-bg: #ffffff; 
             --primary: #4f46e5; 
-            --success: #10b981; /* Verde */
-            --warning-green: #84cc16; /* Galben-Verde */
-            --orange: #f97316; /* Portocaliu */
-            --error: #ef4444; /* Rosu */
+            --success: #10b981; 
+            --warning-green: #84cc16; 
+            --orange: #f97316; 
+            --error: #ef4444; 
             --text-main: #1e293b; 
             --text-muted: #64748b;
         }
         
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; }
+        /* BLOCARE GESTURI BROWSER PENTRU ASPECT DE APLICAȚIE */
+        html, body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            margin: 0; 
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            position: fixed; /* Blochează mișcarea paginii în spate */
+            overflow: hidden;
+            overscroll-behavior: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto; /* Permite scroll doar în interiorul containerului */
+            -webkit-overflow-scrolling: touch;
+        }
+
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -37,14 +63,14 @@
         .btn-launch { background: var(--success); }
         .btn-stop { background: var(--error); }
         .btn-reset { background: #64748b; }
-        .btn-sm { padding: 4px 8px; font-size: 0.75rem; margin-left: 4px; }
+        .btn-sm { padding: 4px 8px; font-size: 0.75rem; margin-left: 4px; border-radius: 6px; border: none; cursor: pointer; color: white; }
         .btn-edit { background: #f59e0b; }
         .btn-delete { background: var(--error); }
 
         .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; background: #e2e8f0; color: #64748b; }
         .active-now { background: #dcfce7; color: #166534; border: 1px solid #10b981; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding-bottom: 40px; }
         .student-card { background: white; padding: 20px; border-radius: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); }
         
         .progress-bg { background: #eee; height: 10px; border-radius: 5px; margin: 12px 0; overflow: hidden; }
@@ -114,12 +140,11 @@
         }
     }
 
-    // --- MODIFICARE REALIZATĂ AICI: PRAGURILE PENTRU CULORI ---
     function getBarColor(percent) {
-        if (percent < 30) return "#ef4444"; // Rosu
-        if (percent < 60) return "#f97316"; // Portocaliu
-        if (percent < 85) return "#a3e635"; // Galben-Verde (ajustat la 85)
-        return "#22c55e"; // Verde (peste 85)
+        if (percent < 30) return "#ef4444"; 
+        if (percent < 60) return "#f97316"; 
+        if (percent < 85) return "#a3e635"; 
+        return "#22c55e"; 
     }
 
     db.ref('setari').on('value', (snap) => {
@@ -162,4 +187,3 @@
 </script>
 </body>
 </html>
-
