@@ -18,7 +18,6 @@
             --text-main: #1e293b;
             --text-muted: #64748b;
             --success: #10b981;
-            --error: #ef4444;
             --accent: #f1f5f9;
         }
 
@@ -32,9 +31,36 @@
             padding: 20px;
             display: flex;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        .app-container {
+        /* ECRAN LOGIN */
+        #login-screen {
+            width: 100%;
+            max-width: 400px;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .login-input:focus { border-color: var(--primary); }
+
+        /* ECRAN TEST (Ascuns initial) */
+        #test-screen {
+            display: none;
             width: 100%;
             max-width: 900px;
             background: var(--card-bg);
@@ -50,18 +76,8 @@
             padding-bottom: 20px;
         }
 
-        h1 {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin: 0;
-        }
-
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 1rem;
-            margin-top: 8px;
-        }
+        h1 { font-size: 2rem; color: var(--primary); margin: 0; }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 8px; }
 
         #student-name-display {
             font-weight: 600;
@@ -116,11 +132,6 @@
             text-align: center;
         }
 
-        .blank-input:focus {
-            border-bottom-color: var(--primary);
-            background-color: #eff6ff;
-        }
-
         .blank-input.is-correct {
             border-bottom-color: var(--success);
             color: var(--success);
@@ -141,17 +152,11 @@
             font-weight: 600;
             cursor: pointer;
             border: none;
+            width: 100%;
         }
 
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-secondary {
-            background-color: var(--accent);
-            color: var(--text-muted);
-        }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-secondary { background-color: var(--accent); color: var(--text-muted); width: auto; }
 
         #score-display {
             text-align: center;
@@ -164,27 +169,34 @@
 </head>
 <body>
 
-<div class="app-container">
-    <header>
-        <h1>Pregătire Bacalaureat</h1>
-        <div class="subtitle">Completează spațiile libere (Progresul crește doar la răspunsuri corecte)</div>
-        <span id="student-name-display">Elev: Se încarcă...</span>
-    </header>
-
-    <div class="progress-container">
-        <div class="progress-bar-bg"><div id="progress-fill"></div></div>
-        <span id="progress-text" style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">0%</span>
+    <div id="login-screen">
+        <h1>Bun venit!</h1>
+        <p class="subtitle">Introdu numele tău pentru a începe testul</p>
+        <input type="text" id="name-input" class="login-input" placeholder="Nume și Prenume...">
+        <button class="btn btn-primary" onclick="startTest()">Începe Testul</button>
     </div>
 
-    <div id="content" class="content-area"></div>
+    <div id="test-screen">
+        <header>
+            <h1>Pregătire Bacalaureat</h1>
+            <div class="subtitle">Completează spațiile libere</div>
+            <span id="student-name-display">Elev: ...</span>
+        </header>
 
-    <div id="score-display"></div>
+        <div class="progress-container">
+            <div class="progress-bar-bg"><div id="progress-fill"></div></div>
+            <span id="progress-text" style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">0%</span>
+        </div>
 
-    <div class="actions">
-        <button class="btn btn-primary" onclick="finalCheck()">Finalizează Testul</button>
-        <button class="btn btn-secondary" onclick="resetTest()">Resetează</button>
+        <div id="content" class="content-area"></div>
+
+        <div id="score-display"></div>
+
+        <div class="actions">
+            <button class="btn btn-primary" style="width:auto;" onclick="finalCheck()">Finalizează Testul</button>
+            <button class="btn btn-secondary" onclick="resetEverything()">Resetează tot</button>
+        </div>
     </div>
-</div>
 
 <script>
     // CONFIGURATIE FIREBASE
@@ -195,21 +207,13 @@
       projectId: "bacromana-6f3eb",
       storageBucket: "bacromana-6f3eb.firebasestorage.app",
       messagingSenderId: "1087294677634",
-      appId: "1:1087294677634:web:d92bf75a8b58f7b351ca9b",
-      measurementId: "G-DV2W8WFVCZ"
+      appId: "1:1087294677634:web:d92bf75a8b58f7b351ca9b"
     };
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Gestionare Nume (Persistă la refresh)
-    let studentName = localStorage.getItem('elev_nume');
-    if (!studentName) {
-        studentName = prompt("Te rugăm să introduci numele tău complet:") || "Elev Anonim";
-        localStorage.setItem('elev_nume', studentName);
-    }
-    document.getElementById('student-name-display').innerText = "Elev: " + studentName;
-
+    let studentName = "";
     const rawText = `Publicata in anul 1884, comedia [O scrisoare pierduta] de I.L. Caragiale apartine realismului [clasic]. 
 
 Tema centrala este degradarea vietii [politice], sociale si de familie. Actiunea se desfasoara in capitala unui judet de munte, pe fondul agitatiei alegerilor pentru [parlament].
@@ -218,19 +222,45 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
 
     let correctAnswers = [];
 
-    function init() {
+    // Verificam daca elevul s-a logat deja anterior
+    window.onload = function() {
+        const savedName = localStorage.getItem('elev_nume');
+        if (savedName) {
+            studentName = savedName;
+            showTest();
+        }
+    }
+
+    function startTest() {
+        const nameInput = document.getElementById('name-input').value.trim();
+        if (nameInput.length < 3) {
+            alert("Te rugăm să introduci un nume valid!");
+            return;
+        }
+        studentName = nameInput;
+        localStorage.setItem('elev_nume', studentName);
+        showTest();
+    }
+
+    function showTest() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('test-screen').style.display = 'block';
+        document.getElementById('student-name-display').innerText = "Elev: " + studentName;
+        initTest();
+    }
+
+    function initTest() {
         const container = document.getElementById('content');
+        if(container.innerHTML !== "") return; // Prevenim dublarea la refresh
+
         let i = 0;
-        
         const formattedText = rawText.replace(/\[(.*?)\]/g, (match, word) => {
             correctAnswers.push(word.trim());
             return `<input type="text" class="blank-input" data-index="${i++}" oninput="updateProgress()">`;
         });
 
         container.innerHTML = formattedText.replace(/\n/g, '<br>');
-        
-        // Încărcăm răspunsurile salvate dacă există
-        loadSavedProgress();
+        loadSavedAnswers();
     }
 
     function updateProgress() {
@@ -239,13 +269,8 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
         let answersToSave = [];
 
         inputs.forEach((input, idx) => {
-            const val = input.value;
-            answersToSave.push(val); // Salvăm valoarea brută pentru memorie
-
-            const userVal = val.trim().toLowerCase();
-            const correctVal = correctAnswers[idx].toLowerCase();
-
-            if (userVal === correctVal) {
+            answersToSave.push(input.value);
+            if (input.value.trim().toLowerCase() === correctAnswers[idx].toLowerCase()) {
                 correctCount++;
                 input.classList.add('is-correct');
             } else {
@@ -253,14 +278,12 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
             }
         });
         
-        // Salvare în memoria browserului
         localStorage.setItem('elev_raspunsuri', JSON.stringify(answersToSave));
 
         const percent = Math.round((correctCount / correctAnswers.length) * 100);
         document.getElementById('progress-fill').style.width = percent + "%";
         document.getElementById('progress-text').innerText = percent + "%";
 
-        // Sincronizare Firebase
         database.ref('clasa/' + studentName).set({
             nume: studentName,
             progres: percent,
@@ -270,7 +293,7 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
         });
     }
 
-    function loadSavedProgress() {
+    function loadSavedAnswers() {
         const saved = localStorage.getItem('elev_raspunsuri');
         if (saved) {
             const answers = JSON.parse(saved);
@@ -278,50 +301,35 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
             inputs.forEach((input, idx) => {
                 if (answers[idx]) input.value = answers[idx];
             });
-            updateProgress(); // Revalidăm scorul și progresul
+            updateProgress();
         }
     }
 
-    function resetTest() {
-        if (confirm("Ești sigur că vrei să ștergi tot progresul?")) {
-            localStorage.removeItem('elev_raspunsuri');
-            localStorage.removeItem('elev_nume');
+    function resetEverything() {
+        if (confirm("Vrei să ștergi tot (inclusiv numele) și să reîncepi?")) {
+            localStorage.clear();
             location.reload();
         }
     }
 
     function finalCheck() {
+        // ... (Codul de finalCheck ramane la fel ca anterior)
         const inputs = document.querySelectorAll('.blank-input');
         let totalCorrect = 0;
-
         inputs.forEach((input, idx) => {
-            const userVal = input.value.trim().toLowerCase();
-            const correctVal = correctAnswers[idx].toLowerCase();
-
-            if (userVal === correctVal) {
+            if (input.value.trim().toLowerCase() === correctAnswers[idx].toLowerCase()) {
                 input.style.backgroundColor = "#ecfdf5";
-                input.style.borderColor = "#10b981";
                 totalCorrect++;
             } else {
                 input.style.backgroundColor = "#fef2f2";
-                input.style.borderColor = "#ef4444";
-                input.title = "Răspuns corect: " + correctAnswers[idx];
+                input.title = "Corect: " + correctAnswers[idx];
             }
         });
-
-        const scoreDiv = document.getElementById('score-display');
-        scoreDiv.style.display = "block";
-        scoreDiv.innerHTML = `Rezultat final: ${totalCorrect} din ${correctAnswers.length} puncte!`;
-        scoreDiv.scrollIntoView({ behavior: 'smooth' });
-
-        database.ref('clasa/' + studentName).update({
-            status: "Finalizat",
-            progres: 100,
-            scor: totalCorrect + "/" + correctAnswers.length
-        });
+        document.getElementById('score-display').style.display = "block";
+        document.getElementById('score-display').innerHTML = `Scor: ${totalCorrect}/${correctAnswers.length}`;
+        
+        database.ref('clasa/' + studentName).update({ status: "Finalizat" });
     }
-
-    init();
 </script>
 
 </body>
