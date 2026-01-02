@@ -75,7 +75,7 @@
         #progress-fill {
             height: 100%;
             width: 0%;
-            background-color: #ef4444; 
+            background-color: #ef4444; /* Start Rosu */
             border-radius: 10px;
             transition: width 0.5s ease, background-color 0.5s ease;
         }
@@ -154,9 +154,13 @@
 </div>
 
 <script>
-    // Numele elevului rămâne în localStorage pentru a nu cere logarea repetată la hub
+    // Preluăm datele de identificare
     let studentName = localStorage.getItem('elev_nume');
-    if (!studentName) { window.location.href = 'index.html'; }
+    let studentID = localStorage.getItem('student_id');
+
+    if (!studentName || !studentID) { 
+        window.location.href = 'index.html'; 
+    }
 
     const firebaseConfig = {
       apiKey: "AIzaSyC2xOfKBy7FdA6uIyM0ij5ryHTop0yL3pg",
@@ -189,7 +193,7 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
         });
         container.innerHTML = formattedText.replace(/\n/g, '<br>');
         
-        // Citim progresul salvat în sesiune (rămâne la refresh, dispare la tab nou)
+        // Citim progresul din SESSION (rămâne la refresh, dispare la tab nou)
         loadSavedProgress();
     }
 
@@ -212,12 +216,12 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
                 input.style.color = "#10b981"; // Text Verde
                 input.style.borderBottomColor = "#10b981";
             } else {
-                input.style.color = "#4f46e5"; // Text Albastru
+                input.style.color = "#4f46e5"; // Text Albastru original
                 input.style.borderBottomColor = "#cbd5e1";
             }
         });
         
-        // MODIFICARE: Salvăm în sessionStorage
+        // Salvăm răspunsurile în sesiune
         sessionStorage.setItem('elev_raspunsuri', JSON.stringify(answersToSave));
 
         const percent = Math.round((correctCount / correctAnswers.length) * 100);
@@ -228,7 +232,8 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
         
         document.getElementById('progress-text').innerText = percent + "%";
 
-        database.ref('clasa/' + studentName).set({
+        // IMPORTANT: Sincronizăm cu Firebase folosind studentID (UNIC)
+        database.ref('clasa/' + studentID).set({
             nume: studentName,
             progres: percent,
             scor: correctCount + "/" + correctAnswers.length,
@@ -237,7 +242,6 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
     }
 
     function loadSavedProgress() {
-        // MODIFICARE: Citim din sessionStorage
         const saved = sessionStorage.getItem('elev_raspunsuri');
         if (saved) {
             const answers = JSON.parse(saved);
@@ -250,7 +254,7 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
     function resetTest() {
         if (confirm("Resetezi tot progresul?")) {
             sessionStorage.removeItem('elev_raspunsuri');
-            localStorage.removeItem('elev_nume');
+            localStorage.clear();
             window.location.href = 'index.html';
         }
     }
@@ -267,13 +271,14 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
             }
         });
 
-        const finalPercent = Math.round((totalCorrect / correctAnswers.length) * 100);
+        const realFinalPercent = Math.round((totalCorrect / correctAnswers.length) * 100);
         document.getElementById('score-display').style.display = "block";
         document.getElementById('score-display').innerHTML = `Rezultat final: ${totalCorrect}/${correctAnswers.length}`;
 
-        database.ref('clasa/' + studentName).update({
+        // Update final în Firebase pe ID-ul unic
+        database.ref('clasa/' + studentID).update({
             status: "Finalizat",
-            progres: finalPercent,
+            progres: realFinalPercent,
             scor: totalCorrect + "/" + correctAnswers.length
         });
     }
