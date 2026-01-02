@@ -1,20 +1,122 @@
-<div style="background: #1e293b; padding: 20px; border-radius: 15px; margin-bottom: 20px;">
-    <h3>Control Test</h3>
-    <button onclick="lanseazaTest(true)" style="background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;">LANSEAZĂ TESTUL</button>
-    <button onclick="lanseazaTest(false)" style="background: #ef4444; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin-left: 10px;">OPREȘTE TESTUL</button>
-    <button onclick="reseteazaClasa()" style="background: #64748b; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin-left: 10px;">Golește Lista Elevi</button>
-</div>
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Panou Profesor - Gestiune Teste</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <style>
+        :root { --bg-color: #f1f5f9; --card-bg: #ffffff; --primary: #4f46e5; --success: #10b981; --error: #ef4444; --text-main: #1e293b; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: white; }
+        .btn-launch { background: var(--success); }
+        .btn-stop { background: var(--error); }
+        .btn-reset { background: #64748b; }
+        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
+        .active-now { background: #dcfce7; color: #166534; border: 1px solid #10b981; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Colecție de Teste</h1>
+            <p>Selectează testul pe care vrei să îl trimiți către tabletele elevilor.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nume Test</th>
+                        <th>Fișier Sursă</th>
+                        <th>Acțiune</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Test 1: Comedia "O scrisoare pierdută"</td>
+                        <td><code>test1.html</code></td>
+                        <td><button class="btn btn-launch" onclick="lanseazaTest('test1.html', 'O scrisoare pierduta')">LANSEAZĂ</button></td>
+                    </tr>
+                    <tr>
+                        <td>Test 2: Modernismul (Exemplu)</td>
+                        <td><code>test2.html</code></td>
+                        <td><button class="btn btn-launch" onclick="lanseazaTest('test2.html', 'Modernismul')">LANSEAZĂ</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px dashed #e2e8f0;">
+                <strong>Stare Actuală:</strong> <span id="current-status" class="status-badge">Niciun test activ</span>
+                <button class="btn btn-stop" style="margin-left:10px" onclick="opresteTestul()">OPREȘTE TOATE TESTELE</button>
+                <button class="btn btn-reset" style="margin-left:10px" onclick="resetClasa()">RESETEAZĂ LISTA ELEVI</button>
+            </div>
+        </div>
+
+        <h2>Monitorizare Live</h2>
+        <div id="students-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;"></div>
+    </div>
 
 <script>
-    // Funcțiile de control pentru profesor
-    function lanseazaTest(stare) {
-        database.ref('setari/test_activ').set(stare);
-        alert(stare ? "Testul a fost lansat!" : "Testul a fost oprit!");
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2xOfKBy7FdA6uIyM0ij5ryHTop0yL3pg",
+      authDomain: "bacromana-6f3eb.firebaseapp.com",
+      databaseURL: "https://bacromana-6f3eb-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "bacromana-6f3eb",
+      storageBucket: "bacromana-6f3eb.firebasestorage.app",
+      messagingSenderId: "1087294677634",
+      appId: "1:1087294677634:web:d92bf75a8b58f7b351ca9b"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function lanseazaTest(fileId, displayName) {
+        db.ref('setari').set({
+            test_activ: true,
+            test_id: fileId,
+            test_nume: displayName
+        });
+        alert("Testul '" + displayName + "' a fost trimis elevilor!");
     }
 
-    function reseteazaClasa() {
-        if(confirm("Ștergi toate rezultatele actuale?")) {
-            database.ref('clasa').remove();
-        }
+    function opresteTestul() {
+        db.ref('setari/test_activ').set(false);
+        alert("Accesul la teste a fost închis.");
     }
+
+    function resetClasa() {
+        if(confirm("Ștergi rezultatele afișate?")) db.ref('clasa').remove();
+    }
+
+    // Actualizare status în timp real pe pagina ta
+    db.ref('setari').on('value', (snap) => {
+        const data = snap.val();
+        const statusEl = document.getElementById('current-status');
+        if(data && data.test_activ) {
+            statusEl.innerText = "ACTIV: " + data.test_nume;
+            statusEl.className = "status-badge active-now";
+        } else {
+            statusEl.innerText = "INACTIV";
+            statusEl.className = "status-badge";
+        }
+    });
+
+    // Grid monitorizare (codul anterior adaptat)
+    db.ref('clasa').on('value', (snapshot) => {
+        const grid = document.getElementById('students-grid');
+        grid.innerHTML = '';
+        const data = snapshot.val();
+        for (let id in data) {
+            const s = data[id];
+            grid.innerHTML += `<div style="background:white;padding:15px;border-radius:15px;box-shadow:0 2px 4px rgba(0,0,0,0.1)">
+                <strong>${s.nume}</strong><br>
+                <small>${s.status}</small>
+                <div style="background:#eee;height:8px;border-radius:4px;margin:10px 0"><div style="width:${s.progres}%;background:#10b981;height:100%;border-radius:4px"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:0.8rem"><span>${s.progres}%</span><span>${s.scor}</span></div>
+            </div>`;
+        }
+    });
 </script>
+</body>
+</html>
