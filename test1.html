@@ -293,23 +293,39 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
     }
 
     function finalCheck() {
-        const inputs = document.querySelectorAll('.blank-input');
-        let totalCorrect = 0;
+    const inputs = document.querySelectorAll('.blank-input');
+    let totalCorrect = 0;
 
-        inputs.forEach((input, idx) => {
-            const userVal = input.value.trim().toLowerCase();
-            const correctVal = correctAnswers[idx].toLowerCase();
+    inputs.forEach((input, idx) => {
+        const userVal = input.value.trim().toLowerCase();
+        const correctVal = correctAnswers[idx].toLowerCase();
 
-            if (userVal === correctVal) {
-                input.style.backgroundColor = "#ecfdf5";
-                input.style.borderColor = "#10b981";
-                totalCorrect++;
-            } else {
-                input.style.backgroundColor = "#fef2f2";
-                input.style.borderColor = "#ef4444";
-                input.title = "Răspuns corect: " + correctAnswers[idx];
-            }
-        });
+        if (userVal === correctVal) {
+            input.style.backgroundColor = "#ecfdf5";
+            input.style.borderColor = "#10b981";
+            totalCorrect++;
+        } else {
+            input.style.backgroundColor = "#fef2f2";
+            input.style.borderColor = "#ef4444";
+            input.title = "Răspuns corect: " + correctAnswers[idx];
+        }
+    });
+
+    // CALCULĂM PROCENTUL REAL FINAL
+    const finalPercent = Math.round((totalCorrect / correctAnswers.length) * 100);
+
+    const scoreDiv = document.getElementById('score-display');
+    scoreDiv.style.display = "block";
+    scoreDiv.innerHTML = `Rezultat final: ${totalCorrect} din ${correctAnswers.length} puncte!`;
+    scoreDiv.scrollIntoView({ behavior: 'smooth' });
+
+    // TRIMITEM PROCENTUL REAL CĂTRE PROFESOR
+    database.ref('clasa/' + studentName).update({
+        status: "Finalizat",
+        progres: finalPercent, // Aici am pus scorul real în loc de 100 fix
+        scor: totalCorrect + "/" + correctAnswers.length
+    });
+}
 
         const scoreDiv = document.getElementById('score-display');
         scoreDiv.style.display = "block";
@@ -327,4 +343,5 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
 </script>
 
 </body>
+
 </html>
