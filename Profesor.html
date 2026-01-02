@@ -107,12 +107,12 @@
         }
     }
 
-    // FUNCȚIE PENTRU DETERMINAREA CULORII BAREI
+    // --- MODIFICARE REALIZATĂ AICI: PRAGURILE PENTRU CULORI ---
     function getBarColor(percent) {
         if (percent < 30) return "#ef4444"; // Rosu
         if (percent < 60) return "#f97316"; // Portocaliu
-        if (percent < 90) return "#a3e635"; // Galben-Verde
-        return "#22c55e"; // Verde
+        if (percent < 85) return "#a3e635"; // Galben-Verde (ajustat la 85)
+        return "#22c55e"; // Verde (peste 85)
     }
 
     db.ref('setari').on('value', (snap) => {
