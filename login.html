@@ -2,139 +2,30 @@
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Identificare Elev - Atelier</title>
+    <title>Identificare Elev</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --primary: #4f46e5;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --accent: #f1f5f9;
-        }
-
-        * { box-sizing: border-box; transition: all 0.2s ease; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .app-container {
-            width: 90%;
-            max-width: 400px;
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-            text-align: center;
-        }
-
-        h2 {
-            margin-top: 0;
-            color: var(--primary);
-            font-size: 1.6rem;
-        }
-
-        p {
-            color: var(--text-muted);
-            line-height: 1.5;
-            margin-bottom: 25px;
-            font-size: 0.95rem;
-        }
-
-        input {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 2px solid var(--accent);
-            border-radius: 12px;
-            font-size: 1.1rem;
-            outline: none;
-            text-align: center;
-            font-family: 'Inter', sans-serif;
-        }
-
-        input:focus {
-            border-color: var(--primary);
-            background-color: #fcfdff;
-        }
-
-        button {
-            width: 100%;
-            background-color: var(--primary);
-            color: white;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
-        }
-
-        button:hover {
-            background-color: #4338ca;
-            transform: translateY(-1px);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 350px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 20px 0; border: 2px solid #e2e8f0; border-radius: 10px; outline: none; box-sizing: border-box; }
+        button { background: #4f46e5; color: white; border: none; padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; }
     </style>
 </head>
 <body>
-
-    <div class="app-container">
+    <div class="card">
         <h2>Cine ești?</h2>
-        <p>Introdu numele tău complet pentru a accesa testul.</p>
-        
-        <input type="text" id="nume-elev" placeholder="Nume și Prenume" autofocus>
-        
+        <p style="color: #64748b">Introdu numele tău complet pentru a începe.</p>
+        <input type="text" id="nume-elev" placeholder="Nume și Prenume">
         <button onclick="intraInTest()">ÎNCEPE TESTUL</button>
     </div>
 
     <script>
         function intraInTest() {
-            const numeIntrodus = document.getElementById('nume-elev').value.trim();
-            
-            if (numeIntrodus.length < 3) {
-                alert("Te rugăm să introduci un nume valid!");
-                return;
-            }
-
-            // 1. Generăm un ID unic pentru a evita suprascrierea elevilor cu același nume
-            // Format: Nume_NumarAleator (ex: Andrei_4281)
-            const studentID = numeIntrodus.replace(/\s+/g, '_') + "_" + Math.floor(Math.random() * 10000);
-
-            // 2. Curățăm sesiunea anterioară de răspunsuri (pentru a fi testul gol la logare nouă)
-            sessionStorage.removeItem('elev_raspunsuri');
-
-            // 3. Salvăm datele în browser
-            localStorage.setItem('elev_nume', numeIntrodus); // Pentru afișare pe ecran
-            localStorage.setItem('student_id', studentID);   // Pentru cheia unică din Firebase
-            
-            // 4. Preluăm fișierul testului setat de profesor din Hub (index.html)
-            const targetTest = localStorage.getItem('current_test_file') || 'test1.html';
-            
-            // 5. Redirecționăm către test
-            window.location.href = targetTest;
+            const nume = document.getElementById('nume-elev').value.trim();
+            if (nume.length < 3) return alert("Introdu un nume valid!");
+            localStorage.setItem('elev_nume', nume);
+            window.location.href = 'test1.html'; // Trimite la fișierul testului
         }
-
-        // Permitem logarea prin tasta Enter
-        document.getElementById('nume-elev').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                intraInTest();
-            }
-        });
     </script>
 </body>
 </html>
