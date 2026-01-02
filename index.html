@@ -63,7 +63,6 @@
             margin-top: 8px;
         }
 
-        /* ADAUGAT: Stil pentru numele elevului */
         #student-name-display {
             font-weight: 600;
             color: var(--primary);
@@ -167,8 +166,8 @@
 
 <div class="app-container">
     <header>
-        <h1>Pregatire Bacalaureat</h1>
-        <div class="subtitle">Completeaza spatiile libere (Progresul creste doar la raspunsuri corecte)</div>
+        <h1>Pregătire Bacalaureat</h1>
+        <div class="subtitle">Completează spațiile libere (Progresul crește doar la răspunsuri corecte)</div>
         <span id="student-name-display">Elev: Se încarcă...</span>
     </header>
 
@@ -182,13 +181,13 @@
     <div id="score-display"></div>
 
     <div class="actions">
-        <button class="btn btn-primary" onclick="finalCheck()">Finalizeaza Testul</button>
-        <button class="btn btn-secondary" onclick="window.location.reload()">Reseteaza</button>
+        <button class="btn btn-primary" onclick="finalCheck()">Finalizează Testul</button>
+        <button class="btn btn-secondary" onclick="resetTest()">Resetează</button>
     </div>
 </div>
 
 <script>
-    // 2. ADAUGAM CONFIGURATIA TA FIREBASE
+    // CONFIGURATIE FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyC2xOfKBy7FdA6uIyM0ij5ryHTop0yL3pg",
       authDomain: "bacromana-6f3eb.firebaseapp.com",
@@ -200,12 +199,15 @@
       measurementId: "G-DV2W8WFVCZ"
     };
 
-    // Inițializare Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Cerem numele elevului
-    let studentName = prompt("Te rugăm să introduci numele tău complet:") || "Elev Anonim";
+    // Gestionare Nume (Persistă la refresh)
+    let studentName = localStorage.getItem('elev_nume');
+    if (!studentName) {
+        studentName = prompt("Te rugăm să introduci numele tău complet:") || "Elev Anonim";
+        localStorage.setItem('elev_nume', studentName);
+    }
     document.getElementById('student-name-display').innerText = "Elev: " + studentName;
 
     const rawText = `Publicata in anul 1884, comedia [O scrisoare pierduta] de I.L. Caragiale apartine realismului [clasic]. 
@@ -222,18 +224,25 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
         
         const formattedText = rawText.replace(/\[(.*?)\]/g, (match, word) => {
             correctAnswers.push(word.trim());
-            return `<input type="text" class="blank-input" data-index="${i++}" oninput="updateProgress(this)">`;
+            return `<input type="text" class="blank-input" data-index="${i++}" oninput="updateProgress()">`;
         });
 
         container.innerHTML = formattedText.replace(/\n/g, '<br>');
+        
+        // Încărcăm răspunsurile salvate dacă există
+        loadSavedProgress();
     }
 
-    function updateProgress(inputElement) {
+    function updateProgress() {
         const inputs = document.querySelectorAll('.blank-input');
         let correctCount = 0;
+        let answersToSave = [];
 
         inputs.forEach((input, idx) => {
-            const userVal = input.value.trim().toLowerCase();
+            const val = input.value;
+            answersToSave.push(val); // Salvăm valoarea brută pentru memorie
+
+            const userVal = val.trim().toLowerCase();
             const correctVal = correctAnswers[idx].toLowerCase();
 
             if (userVal === correctVal) {
@@ -244,18 +253,41 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
             }
         });
         
+        // Salvare în memoria browserului
+        localStorage.setItem('elev_raspunsuri', JSON.stringify(answersToSave));
+
         const percent = Math.round((correctCount / correctAnswers.length) * 100);
         document.getElementById('progress-fill').style.width = percent + "%";
         document.getElementById('progress-text').innerText = percent + "%";
 
-        // 3. SINCRONIZARE CU PROFESORUL
+        // Sincronizare Firebase
         database.ref('clasa/' + studentName).set({
             nume: studentName,
             progres: percent,
             scor: correctCount + "/" + correctAnswers.length,
-            status: "In lucru",
+            status: "În lucru",
             ultimaActualizare: Date.now()
         });
+    }
+
+    function loadSavedProgress() {
+        const saved = localStorage.getItem('elev_raspunsuri');
+        if (saved) {
+            const answers = JSON.parse(saved);
+            const inputs = document.querySelectorAll('.blank-input');
+            inputs.forEach((input, idx) => {
+                if (answers[idx]) input.value = answers[idx];
+            });
+            updateProgress(); // Revalidăm scorul și progresul
+        }
+    }
+
+    function resetTest() {
+        if (confirm("Ești sigur că vrei să ștergi tot progresul?")) {
+            localStorage.removeItem('elev_raspunsuri');
+            localStorage.removeItem('elev_nume');
+            location.reload();
+        }
     }
 
     function finalCheck() {
@@ -273,7 +305,7 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
             } else {
                 input.style.backgroundColor = "#fef2f2";
                 input.style.borderColor = "#ef4444";
-                input.title = "Raspuns corect: " + correctAnswers[idx];
+                input.title = "Răspuns corect: " + correctAnswers[idx];
             }
         });
 
@@ -282,7 +314,6 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
         scoreDiv.innerHTML = `Rezultat final: ${totalCorrect} din ${correctAnswers.length} puncte!`;
         scoreDiv.scrollIntoView({ behavior: 'smooth' });
 
-        // Trimitem statusul final către profesor
         database.ref('clasa/' + studentName).update({
             status: "Finalizat",
             progres: 100,
