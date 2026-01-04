@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-    <link rel="manifest" href="manifest.json">
-
-    <meta name="theme-color" content="#4f46e5">
-    <meta name="mobile-web-app-capable" content="yes">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Atelier de Literatura - Bacalaureat</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
@@ -20,23 +19,21 @@
         :root {
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
-            --primary: #4f46e5; /* Albastru */
+            --primary: #4f46e5;
             --text-main: #1e293b;
-            --text-muted: #64748b;
-            --success: #10b981; /* Verde */
+            --success: #10b981;
             --accent: #f1f5f9;
         }
 
         * { box-sizing: border-box; transition: all 0.2s ease; }
 
-        body {
+        html, body { 
+            overscroll-behavior: none; 
+            user-select: none; -webkit-user-select: none;
+            background-color: var(--bg-color); 
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
+            margin: 0; padding: 20px;
+            display: flex; justify-content: center;
         }
 
         .app-container {
@@ -45,7 +42,7 @@
             background: var(--card-bg);
             padding: 40px;
             border-radius: 24px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
         }
 
         header {
@@ -55,7 +52,7 @@
             padding-bottom: 20px;
         }
 
-        h1 { font-size: 2rem; font-weight: 600; color: var(--primary); margin: 0; }
+        h1 { font-size: 1.8rem; color: var(--primary); margin: 0; }
 
         #student-name-display {
             font-weight: 600;
@@ -67,21 +64,17 @@
         .progress-container {
             margin-bottom: 30px;
             display: flex;
-            align-items: center;
-            gap: 15px;
+            align-items: center; gap: 15px;
         }
 
         .progress-bar-bg {
-            flex-grow: 1;
-            height: 12px;
+            flex-grow: 1; height: 12px;
             background: var(--accent);
-            border-radius: 10px;
-            overflow: hidden;
+            border-radius: 10px; overflow: hidden;
         }
 
         #progress-fill {
-            height: 100%;
-            width: 0%;
+            height: 100%; width: 0%;
             background-color: #ef4444; 
             border-radius: 10px;
             transition: width 0.5s ease, background-color 0.5s ease;
@@ -89,66 +82,53 @@
 
         .content-area {
             font-family: 'Merriweather', serif;
-            line-height: 2.2;
-            font-size: 1.25rem;
-            color: #334155;
-            text-align: justify;
+            line-height: 2.2; font-size: 1.2rem;
+            color: #334155; text-align: justify;
         }
 
         .blank-input {
             font-family: 'Inter', sans-serif;
-            border: none;
-            border-bottom: 2px solid #cbd5e1;
+            border: none; border-bottom: 2px solid #cbd5e1;
             background-color: #f8fafc;
-            padding: 2px 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--primary);
-            width: 150px;
-            border-radius: 4px 4px 0 0;
-            outline: none;
-            text-align: center;
+            padding: 2px 8px; font-size: 1.1rem;
+            font-weight: 600; color: var(--primary);
+            width: 160px; outline: none; text-align: center;
+            border-radius: 4px;
         }
 
         .actions {
             margin-top: 50px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
+            display: flex; justify-content: center; gap: 15px;
         }
 
         .btn {
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
+            padding: 14px 28px; border-radius: 12px;
+            font-size: 1rem; font-weight: 600;
+            cursor: pointer; border: none;
         }
-
         .btn-primary { background-color: var(--primary); color: white; }
-        .btn-secondary { background-color: var(--accent); color: var(--text-muted); }
+        .btn-secondary { background-color: var(--accent); color: #64748b; }
 
         #score-display {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 1.2rem;
-            font-weight: 600;
+            text-align: center; margin-top: 20px;
+            font-size: 1.2rem; font-weight: 700; color: var(--success);
             display: none;
         }
+
+        h3 { color: var(--primary); margin-top: 30px; border-bottom: 2px solid var(--accent); display: inline-block; }
     </style>
 </head>
 <body onload="init()">
 
 <div class="app-container">
     <header>
-        <h1>Pregătire Bacalaureat</h1>
+        <h1>Evaluare: Povestea lui Harap-Alb</h1>
         <span id="student-name-display">Elev: Se încarcă...</span>
     </header>
 
     <div class="progress-container">
         <div class="progress-bar-bg"><div id="progress-fill"></div></div>
-        <span id="progress-text" style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">0%</span>
+        <span id="progress-text" style="font-size: 0.9rem; font-weight: 600;">0%</span>
     </div>
 
     <div id="content" class="content-area"></div>
@@ -161,7 +141,6 @@
 </div>
 
 <script>
-    // Numele elevului rămâne în localStorage pentru a nu cere logarea repetată la hub
     let studentName = localStorage.getItem('elev_nume');
     if (!studentName) { window.location.href = 'index.html'; }
 
@@ -179,13 +158,40 @@
     const database = firebase.database();
     document.getElementById('student-name-display').innerText = "Elev: " + studentName;
 
-    const rawText = `Publicata in anul 1884, comedia [O scrisoare pierduta] de I.L. Caragiale apartine realismului [clasic]. 
+    const rawText = `<h3>Reper 1</h3>
+Destinul și [modernizarea] literaturii române au fost marcate în perioada [Marilor Clasici] de personalitatea lui [Titu Maiorescu], mentorul „Junimii”. Denumirea are atât semnificația de „[adepți ai clasicismului]”, dar și de „[modele]”, căci adoptând acest program estetic , reprezentanții acestei epoci devin [repere: pentru proza realistă, Ioan Slavici, pentru basmul cult, Ion Creangă, pentru opera dramatică, Ion Luca Caragiale și pentru lirica romantică, Mihai Eminescu]. 
 
-Tema centrala este degradarea vietii [politice], sociale si de familie. Actiunea se desfasoara in capitala unui judet de munte, pe fondul agitatiei alegerilor pentru [parlament].
+Textul aparține [clasei de opere] care utilizeate [narațiunea] ca mod principal de expunere, a cărei denumire provine din limba greacă, „[epikos]” însemnând „povestire”, „cuvânt”. 
 
-Conflictul principal consta in confruntarea a doua grupari politice: cea condusa de Stefan Tipatescu si [Zaharia Trahanache], respectiv gruparea ambitiosului avocat [Nae Catavencu].`;
+Construit pe schema opoziţionalã [Bine-Rãu], basmul cult „Povestea lui Harap-Alb”, publicat în 1877 în „Convorbiri literare”, are un subiect simplu, linear, organizat pe baza unui tipar arhicunoscut: personajul exceptional realizează o [călătorie inițiatică], depășește probele prin curaj și inteligență și, sprijinit de [adjuvanți], învinge Răul. Numeroasele motive sugerează magicul și perfecțiunea: cifra [trei], superioritatea mezinului, cãlãtoria primejdioasã, probele, lupta finalã, recompensa, [nunta]. 
+
+Coordonata [realist-psihologică] reorganizează acest tipar și prezintă maturizarea protagonistului, accentuând dimensiunea sufletească a celui care luptă pentru apărarea unor valori morale ca adevărul, dreptatea, frumosul, iubirea. Pornind de la opinia critică a lui [Alexandru Piru] care consideră textul „un scurt roman fantastic”, se poate afirma că basmul lui Creangă își prelungește semnificațiile dincolo de specia basmului cult și devine un [bildungsroman].
+
+<h3>Reper 2</h3>
+Dominanta tematică se configurează pe două dimensiuni: cea populară, eterna luptă dintre Bine și Rău și cea cultă, formarea [personalității] celui care polarizează interesul epic. 
+
+*O secvență narativă relevantă pentru această tema complexă o constituie coborârea în [fântânã], ad inferos, din cauză că era „boboc de felul său”, reprezentând începutul maturizãrii eroului. Scena echivalează cu un botez, căci prin apă fiul craiului primeşte un alt nume şi o nouă identitate, un nou statut social. Pentru erou, acesta este punctul cel mai de jos în care l-a dus lipsa de experinţă. M [Eliade] considera coborârea în Infern echivalentă cu decapitarea protagonistului, moartea iniţiatică, o experienţă nouă. Această secvență reflectă primul stadiu al existenței mezinului: cel de novice/ începător. El devine rob, pentru că nu distinge clar valoarea de [nonvaloare], pentru că trebuie să parcurgă chinul suferinței „negre” până va deveni un stăpânitor matur și responsabil.*
+
+Se remarcă și un al doilea episod semnificativ care conturează personalitatea tânărului și pune în lumina cealaltă componentă a tematicii, Răul învins de Bine. Ca într-o piesă de teatru, fata dezvăluie adevărata identitate a Spânului, acesta retează capul lui Harap-Alb, acuzându-l de încălcarea [jurământului]. Calul îl ucide pe Spân, aruncându-l din înaltul cerului, în vreme ce fata de împărat îl readuce la viață pe fiul craiului cu ajutorul obiectelor magice, [smicelele de măr dulce], apa vie şi apa moartă. Se încheie, simetric, aventura iniţiatică a protagonistului: prin [paloș] a primit robia, prin paloș își recapătă domnia, sabia devenind element de recurență.
+
+<h3>Reper 3</h3>
+Un element de structură esențial este [titlul] nominal de tip analitic ce promite lectorului o „poveste” deosebită a maturizării tânărului crai, un destin unicizat la nivel gramatical prin substantivul articulat „povestea”. Construcţia oximoronică „Harap-Alb” indică statutul de [slugă naivă], puritatea celui aflat la început de drum. În aceeași măsură este o sugestie a coexistenței Binelui și a Răului.
+
+Formula iniţială şi cea finală înrămează lumea pe care o comunică povestitorul. Incipitul conturează [cronotopul] specific poveștii ce debuteazã ex abrupto cu sintagma „Amu cicã era odatã într-o țară”. Indicele spațial „într-o țară” se combină cu cel temporal „odată” plasând evenimentele intr-un trecut nedeterminat, [illo tempore]. 
+
+Narațiunea la persoana a [III-a] este desfășurată cronologic. Instanța epică este [omniscientă], omniprezentă, demiurgică. Naratorul nu rămâne indiferent, se face auzit prin pactul [narativ] cu cititorul, pus în valoare de formulele mediane de tip captatio [benevolentiae].
+
+Personajele nu au multiple însușiri [supranaturale]. Portretul fizic este schiţat din câteva linii, prin caracterizare [directă]. El se dovedește milos și plin de compasiune față de Sfânta [Duminică], de la care va primi ajutor divin de trei ori. 
+
+Asociat cu Don Quijote sau cu Hamlet, protagonistul s-a schimbat mult de când a plecat de acasă. Relația eroului cu antagonistul basmului, cu [Spânul] îi dezvăluie noblețea firii. Critica modernă afirmă că spânul reprezintă „răul [necesar]”: neiertător, îl supune pe crăițor în permanență unor probe periculoase.`;
 
     let correctAnswers = [];
+
+    function normalize(text) {
+        return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/ț/g, "t").replace(/ț/g, "t").replace(/ș/g, "s").replace(/ș/g, "s")
+            .toLowerCase().trim();
+    }
 
     function init() {
         const container = document.getElementById('content');
@@ -195,16 +201,14 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
             return `<input type="text" class="blank-input" data-index="${i++}" oninput="updateProgress()">`;
         });
         container.innerHTML = formattedText.replace(/\n/g, '<br>');
-        
-        // Citim progresul salvat în sesiune (rămâne la refresh, dispare la tab nou)
         loadSavedProgress();
     }
 
     function getProgressColor(percent) {
-        if (percent < 30) return "#ef4444"; // Rosu
-        if (percent < 60) return "#f97316"; // Portocaliu
-        if (percent < 85) return "#a3e635"; // Galben-Verde
-        return "#22c55e"; // Verde
+        if (percent < 30) return "#ef4444"; 
+        if (percent < 60) return "#f97316"; 
+        if (percent < 85) return "#a3e635"; 
+        return "#22c55e"; 
     }
 
     function updateProgress() {
@@ -214,37 +218,39 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
 
         inputs.forEach((input, idx) => {
             answersToSave.push(input.value); 
-            if (input.value.trim().toLowerCase() === correctAnswers[idx].toLowerCase()) {
+            
+            let userAns = normalize(input.value);
+            let correctAns = normalize(correctAnswers[idx]);
+
+            if (userAns === correctAns && userAns !== "") {
                 correctCount++;
-                input.style.color = "#10b981"; // Text Verde
+                input.style.color = "#10b981";
                 input.style.borderBottomColor = "#10b981";
             } else {
-                input.style.color = "#4f46e5"; // Text Albastru
+                input.style.color = "#4f46e5";
                 input.style.borderBottomColor = "#cbd5e1";
             }
         });
         
-        // MODIFICARE: Salvăm în sessionStorage
         sessionStorage.setItem('elev_raspunsuri', JSON.stringify(answersToSave));
-
         const percent = Math.round((correctCount / correctAnswers.length) * 100);
-        
         const fill = document.getElementById('progress-fill');
         fill.style.width = percent + "%";
         fill.style.backgroundColor = getProgressColor(percent);
-        
         document.getElementById('progress-text').innerText = percent + "%";
 
         database.ref('clasa/' + studentName).set({
             nume: studentName,
             progres: percent,
             scor: correctCount + "/" + correctAnswers.length,
-            status: "În lucru"
+            status: "În lucru",
+            raspunsuri: answersToSave,
+            test_id: "test1.html",   // MODIFICARE: Identificator pentru profesor
+            test_nume: "Harap-Alb"   // MODIFICARE: Numele afisat profesorului
         });
     }
 
     function loadSavedProgress() {
-        // MODIFICARE: Citim din sessionStorage
         const saved = sessionStorage.getItem('elev_raspunsuri');
         if (saved) {
             const answers = JSON.parse(saved);
@@ -266,7 +272,7 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
         const inputs = document.querySelectorAll('.blank-input');
         let totalCorrect = 0;
         inputs.forEach((input, idx) => {
-            if (input.value.trim().toLowerCase() === correctAnswers[idx].toLowerCase()) {
+            if (normalize(input.value) === normalize(correctAnswers[idx])) {
                 totalCorrect++;
                 input.style.backgroundColor = "#ecfdf5";
             } else {
@@ -281,10 +287,12 @@ Conflictul principal consta in confruntarea a doua grupari politice: cea condusa
         database.ref('clasa/' + studentName).update({
             status: "Finalizat",
             progres: finalPercent,
-            scor: totalCorrect + "/" + correctAnswers.length
+            scor: totalCorrect + "/" + correctAnswers.length,
+            test_id: "test1.html",
+            test_nume: "Harap-Alb"
         });
+        alert("Test finalizat! Scorul a fost trimis profesorului.");
     }
 </script>
 </body>
-
 </html>
