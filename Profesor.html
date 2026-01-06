@@ -7,12 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4f46e5">
     
-    <link rel="manifest" href="manifest_prof.json">
-    <link rel="apple-touch-icon" href="icon.png">
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -23,7 +19,6 @@
             --card-bg: #ffffff; 
             --primary: #4f46e5; 
             --success: #10b981; 
-            --orange: #f97316; 
             --error: #ef4444; 
             --text-main: #1e293b; 
             --text-muted: #64748b;
@@ -53,7 +48,6 @@
         .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; color: white; transition: 0.2s; margin-left: 5px; }
         .btn-launch { background: var(--success); }
         .btn-stop { background: var(--error); }
-        .btn-reset { background: #64748b; }
         .btn-delete-all { background: #dc2626; }
         
         .btn-sm { padding: 6px 10px; font-size: 0.75rem; margin-left: 4px; border-radius: 6px; border: none; cursor: pointer; color: white; font-weight: bold; }
@@ -67,8 +61,20 @@
         .student-card { 
             background: white; padding: 20px; border-radius: 18px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--primary);
+            position: relative;
         }
         
+        /* INDICATOR STARE */
+        .status-indicator {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .status-lucru { background: #dbeafe; color: #1e40af; }
+        .status-finalizat { background: #dcfce7; color: #166534; }
+
         .progress-bg { background: #eee; height: 10px; border-radius: 5px; margin: 12px 0; overflow: hidden; }
         .progress-fill { height: 100%; border-radius: 5px; transition: width 0.5s; }
         
@@ -152,7 +158,6 @@
         return "#22c55e"; 
     }
 
-    // Actualizare stare test (Inactiv / Activ)
     db.ref('setari').on('value', snap => {
         const d = snap.val();
         const el = document.getElementById('current-status');
@@ -160,7 +165,6 @@
         el.className = (d && d.test_activ) ? "status-badge active-now" : "status-badge";
     });
 
-    // Monitorizare LIVE elevi
     db.ref('clasa').on('value', snapshot => {
         const grid = document.getElementById('students-grid');
         grid.innerHTML = '';
@@ -172,16 +176,21 @@
             const p = s.progres || 0;
             const barColor = getBarColor(p);
             
+            // Verificăm starea pentru a aplica culoarea corectă badge-ului
+            const statusText = s.status || "În lucru";
+            const statusClass = statusText === "Finalizat" ? "status-finalizat" : "status-lucru";
+            
             grid.innerHTML += `
                 <div class="student-card">
-                    <div style="display:flex; justify-content:space-between;">
-                        <strong>${s.nume}</strong>
-                        <span style="font-size:0.65rem; color:var(--text-muted);">${s.test_nume || ''}</span>
+                    <div style="display:flex; justify-content:space-between; align-items: center;">
+                        <strong style="font-size: 1.1rem;">${s.nume}</strong>
+                        <span class="status-indicator ${statusClass}">${statusText}</span>
                     </div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">${s.test_nume || 'Test'}</div>
                     <div class="progress-bg"><div class="progress-fill" style="width:${p}%; background-color:${barColor};"></div></div>
                     <div class="card-footer">
                         <span>Scor: ${s.scor || '0/0'}</span>
-                        <span>${p}%</span>
+                        <span style="font-weight: bold;">${p}%</span>
                     </div>
                     <div class="actions-row">
                         <button class="btn-sm btn-edit" onclick="editStudent('${id}')">Editează</button>
