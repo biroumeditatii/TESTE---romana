@@ -96,6 +96,16 @@
             border-radius: 4px;
         }
 
+        /* Stil pentru numărul casetei */
+        .input-number {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-right: 2px;
+            vertical-align: super;
+        }
+
         .actions {
             margin-top: 50px;
             display: flex; justify-content: center; gap: 15px;
@@ -158,7 +168,6 @@
     const database = firebase.database();
     document.getElementById('student-name-display').innerText = "Elev: " + studentName;
 
-    // TEXTUL COMPLET CU [MODERNIZAREA] CA PRIM CUVANT
     const rawText = `<b>Reper 1</b>
 Destinul şi [modernizarea] literaturii române au fost marcate în perioada [Marilor Clasici] de personalitatea lui [Titu Maiorescu], mentorul, [Junimii]. Denumirea are atât semnificația de [adepți ai clasicismului], [modele], dar şi de [repere], căci adoptând acest program estetic, reprezentanții epocіі devin [repere].
 
@@ -173,7 +182,7 @@ Dominanta tematică se configurează pe două dimensiuni: [supratema degradării
 
 O secvenţă narativă relevantă o constituie cea dintâi confruntare dramatică a lui Ghiţă cu Sămădăul. Limbajul devine modalitatea de caracterizare a personajelor implicate în acest [conflict exterior]. Lică este [aspru, viclean] și vrea să se impună ca [unic stăpân al locurilor], iar Ghiță este [dârz și motivat], superior fizic lui Lică. Ana intuieşte că Sămădăul este un „[om rău şi primejdios]", iar soțul ei înțelege că „la Moara cu noroc, nu putea să steie nimeni fără voia lui Lică" și îi devine [tovarăş], condiționat de [împrejurări]. Intuind patima pentru bani a lui Ghiță, Sămădăul îi dă de înțeles că [șederea la Moara cu noroc depinde numai de bunul său plac]. Scena este esențială pentru stabilirea relației [călău-victimă].
 
-Se remarcă și un al doilea episod semnificativ: deznodământul ce aduce cu sine rezolvarea conflictelor prin moartea eroilor, ca în [tragedia antică]. Atras în [jocul porcarului], după ce fusese dominat de dorința de a strânge bani, după ce acceptase înțelegeri ruşinoase, doar pentru a-şi atinge țelul, banii, după ce [mințise] și se înstrăinase de familie, de soție, crezând că aşa o apără, Ghiță ajunge pe cea mai de jos [treăpta a degradării morale], asemănătoare unei [coborârii în infern]. Fericirea şi liniştea familiei sunt înlocuite [de teamă, de suferință morală]. În absenţa unei comunicări autentice, Ana crede că [soțul n-o mai iubește], motiv pentru care va plăti cu viața. Roata destinului începe [să macine familia], Ghiță cade şi el victimă [oamenilor lui Lică], [personaj reflector] pentru vina de [a fi dorit prea mult]. Lică se sinucide. Intrate sub semnul [fatalității oarbe], personajele care alcătuiesc [triunghiul de forță] al textului trec marginile rațiunii şi cunosc [moartea în lanț]. Hanul este purificat prin [foc], imaginea finală fiind de o cromatică simbolică: [oasele albe care ies din cenușa neagră].
+Se remarcă și un al doilea episod semnificativ: deznodământul ce aduce cu sine rezolvarea conflictelor prin moartea eroilor, ca în [tragedia antică]. Atras în [jocul porcarului], după ce fusese dominat de dorința de a strânge bani, după ce acceptase înțelegeri ruşinoase, legate de crimă, doar pentru a-şi atinge țelul, banii, după ce [mințise] și se înstrăinase de familie, de soție, crezând că aşa o apără, Ghiță ajunge pe cea mai de jos [treăpta a degradării morale], asemănătoare unei [coborârii în infern]. Fericirea şi liniştea familiei sunt înlocuite [de teamă, de suferință morală]. În absenţa unei comunicări autentice, Ana crede că [soțul n-o mai iubește], motiv pentru care va plăti cu viața. Roata destinului începe [să macine familia], Ghiță cade şi el victimă [oamenilor lui Lică], [personaj reflector] pentru vina de [a fi dorit prea mult]. Lică se sinucide. Intrate sub semnul [fatalității oarbe], personajele care alcătuiesc [triunghiul de forță] al textului trec marginile rațiunii şi cunosc [moartea în lanț]. Hanul este purificat prin [foc], imaginea finală fiind de o cromatică simbolică: [oasele albe care ies din cenușa neagră].
 
 <b>Reper 3</b>
 Titlul nominal dirijează cititorul spre un sens simbolic, profund, cel al [morii care „macină” destine], conturând, în mod ironic prin cuvântul, [malefic]. Univers [unei noi șanse], el este, în esență/în realitate, [aducător de ghinion]. Structura sa [analitică] propune două substantive, cel articulat [unicizează negativ locul], în care diavolul ispiteşte drumețul, spre deosebire de [hanul lui Sadoveanu].
@@ -182,7 +191,7 @@ Viziunea [moralizatoare] a autorului ilustrează o teză enunțată la începutu
 
 Naraţiunea la [persoana a III-a] este desfăşurată [cronologic], prin [înlănțuirea] secvențelor epice, fiind [dramatizată prin dialogul] ce dinamizează întâmplările, susține [evoluția acțiunii] şi caracterizează [personajele]. Instanța epică este [omniscientă], omniprezentă, demiurgică, iar tehnica esențială de a povesti este [cronologia]. Evenimentele se derulează de-a lungul celor [17] capitole, aflate în [„rama” cugetărilor bătrânei]. O metodă narativă ce pledează pentru originalitatea artei scriitorului este [contrapunctul]. Secvenţei intrării în biserică a celor cu frica lui Dumnezeu îi corespunde cea în [care, la Moara cu noroc începe] veselia celor care au [uitat de Divinitate]. Diegeza este dinamică, fiind întreruptă de analiză trăirilor interioare ale lui Ghiţă, ca în orice text [psihologic]. Timpul este încadrat intre [Sfântul Gheorghe și până la Paște].
 
-Concepția realistă a autorului despre nuvelă, înțeleasă ca un „[corp sferoid]" se reflectă în structura sa circulară. Începutul nuvelei are valoare [oraculară/ premonitorie] /de anticipare: bătrâna consideră că [provocarea destinului atrage pedepse grave]. Replicile ei au legătura cu îndemnul [la echilibru]: „Omul să fie mulţumit cu sărăcia sa...". Finalul închis aparține tot [bătrânei], personaj-reflector, ce comunică intenţia [moralizatoare] a autorului: „Simțeam eu [nu are să iasă bine]; dar aşa le-a fost dat!". Se sugerează faptul că o forţă supranaturală decide [totul dinainte], că omul va fi pedepsit dacă [încălcă normele morale]. Imaginea focului [purificator] din [epilogul] nuvelei sugerează faptul că totul este pregătit [pentru un nou început].
+Concepția realistă a autorului despre nuvelă, înțeleasă ca un „[corp sferoid]" se reflectă în structura sa circulară. Începutul nuvelei are valoare [oraculară/ premonitorie] /de anticipare: bătrâna consideră că [provocarea destinului atrage pedepse grave]. Replicile ei au legătura cu îndemnul [la echilibru]: „Omul să fie mulţumit cu sărăcia sa...". Finalul închis aparține tot [bătrânei], personaj-reflector, ce comunică intenţia [moralizatoare] a autorului: „Simțeam eu [nu are să iasă bine]; dar aşa le-a fost dat!". Se sugerează faptul că o forţă supranaturală decide [totul dinainte], că omul va fi pedepsit dacă [încălcă normele morale]. Imaginea focului [purificator] din [epilogul] nuvelei sugerată faptul că totul este pregătit [pentru un nou început].
 
 Personajele sunt [instanțe fundamentale] în textul epic, „[ființe de hârtie]“, aşa cum le defineşte [teoria literară], se grupează în [„plate” și “rotunde"], construcția lor realizându-se prin asocierea a [o dimensiune exterioară, alta interioară]. Ghiță, Ana, bătrâna sunt [verosimili]. Doar Lică, un personaj [demonic], are în construcţia sa și elemente de factură [romantica].
 
@@ -207,7 +216,8 @@ Un element de modernitate este [pluriperspectiva/ tehnica oglinzilor paralele/ t
         let i = 0;
         const formattedText = rawText.replace(/\[(.*?)\]/g, (match, word) => {
             correctAnswers.push(word.trim());
-            return `<input type="text" class="blank-input" data-index="${i++}" oninput="updateProgress()">`;
+            // ADĂUGĂM NUMĂRUL (i+1) ÎN FAȚA CASETEI
+            return `<span class="input-number">${i + 1}</span><input type="text" class="blank-input" data-index="${i++}" oninput="updateProgress()">`;
         });
         container.innerHTML = formattedText.replace(/\n/g, '<br>');
         loadSavedProgress();
@@ -246,7 +256,6 @@ Un element de modernitate este [pluriperspectiva/ tehnica oglinzilor paralele/ t
         fill.style.backgroundColor = getProgressColor(percent);
         document.getElementById('progress-text').innerText = percent + "%";
 
-        // CODUL EXACT SOLICITAT
         database.ref('clasa/' + studentName).set({
             nume: studentName,
             progres: percent,
