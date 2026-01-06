@@ -77,7 +77,7 @@
             height: 100%; width: 0%;
             background-color: #ef4444; 
             border-radius: 10px;
-            transition: width 0.5s ease, background-color 0.5s ease;
+            transition: width 0.5s ease;
         }
 
         .content-area {
@@ -94,6 +94,15 @@
             font-weight: 600; color: var(--primary);
             width: 160px; outline: none; text-align: center;
             border-radius: 4px;
+        }
+
+        .input-number {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-right: 2px;
+            vertical-align: super;
         }
 
         .actions {
@@ -115,7 +124,7 @@
             display: none;
         }
 
-        h3 { color: var(--primary); margin-top: 30px; border-bottom: 2px solid var(--accent); display: inline-block; }
+        h3, b { color: var(--primary); display: block; margin-top: 30px; font-size: 1.5rem; border-bottom: 2px solid var(--accent); padding-bottom: 5px; }
     </style>
 </head>
 <body onload="init()">
@@ -158,32 +167,49 @@
     const database = firebase.database();
     document.getElementById('student-name-display').innerText = "Elev: " + studentName;
 
-    const rawText = `<h3>Reper 1</h3>
-Destinul și [modernizarea] literaturii române au fost marcate în perioada [Marilor Clasici] de personalitatea lui [Titu Maiorescu], mentorul „Junimii”. Denumirea are atât semnificația de „[adepți ai clasicismului]”, dar și de „[modele]”, căci adoptând acest program estetic , reprezentanții acestei epoci devin [repere: pentru proza realistă, Ioan Slavici, pentru basmul cult, Ion Creangă, pentru opera dramatică, Ion Luca Caragiale și pentru lirica romantică, Mihai Eminescu]. 
+    const rawText = `<b>Introducere</b>
+Destinul şi [modernizarea] literaturii române au fost marcate în [perioada Marilor Clasici] de personalitatea lui [Titu Maiorescu]. Denumirea are atât semnificația de [adepți ai clasicismului], dar şi de [modele], căci adoptând acest program estetic, reprezentanții epocii devin [repere].
 
-Textul aparține [clasei de opere] care utilizeate [narațiunea] ca mod principal de expunere, a cărei denumire provine din limba greacă, „[epikos]” însemnând „povestire”, „cuvânt”. 
+<b>Reper 1</b>
+Textul aparţine [clasei de opere] care utilizează [narațiunea]. Construit pe [schema opoziţionalã Bine-Rãu] „Povestea lui Harap-Alb", [publicat în 1877] în [Convorbiri literare], are un subiect simplu, linear, organizat pe baza unui [tipar arhicunoscut]. Numeroasele motive sugerează magicul și perfecțiunea: [cifra trei, superioritatea mezinului, cãlãtoria primejdioasã, probele, lupta finalã, recompensa, nunta]. 
 
-Construit pe schema opoziţionalã [Bine-Rãu], basmul cult „Povestea lui Harap-Alb”, publicat în 1877 în „Convorbiri literare”, are un subiect simplu, linear, organizat pe baza unui tipar arhicunoscut: personajul exceptional realizează o [călătorie inițiatică], depășește probele prin curaj și inteligență și, sprijinit de [adjuvanți], învinge Răul. Numeroasele motive sugerează magicul și perfecțiunea: cifra [trei], superioritatea mezinului, cãlãtoria primejdioasã, probele, lupta finalã, recompensa, [nunta]. 
+[Coordonata realist-psihologică] reorganizează acest tipar şi prezintă [maturizarea protagonistului], accentuând [dimensiunea sufletească] a celui care luptă pentru apărarea unor valori morale ca [adevărul, dreptatea, frumosul, iubirea]. [Originalitatea textului] este observabilă și la [nivelul limbajului] dominat [de oralitate, de fraze rimate, de umor]. Pornind de la opinia critică a lui [Alexandru Piru].
 
-Coordonata [realist-psihologică] reorganizează acest tipar și prezintă maturizarea protagonistului, accentuând dimensiunea sufletească a celui care luptă pentru apărarea unor valori morale ca adevărul, dreptatea, frumosul, iubirea. Pornind de la opinia critică a lui [Alexandru Piru] care consideră textul „un scurt roman fantastic”, se poate afirma că basmul lui Creangă își prelungește semnificațiile dincolo de specia basmului cult și devine un [bildungsroman].
+<b>Reper 2</b>
+Dominanta tematică se configurează pe două dimensiuni: cea [populară, eterna luptă dintre Bine și Rău] şi cea cultă, [formarea personalității celui care polarizează interesul epic]. 
 
-<h3>Reper 2</h3>
-Dominanta tematică se configurează pe două dimensiuni: cea populară, eterna luptă dintre Bine și Rău și cea cultă, formarea [personalității] celui care polarizează interesul epic. 
+O secvenţă narativă relevantă pentru această tema complexă o constituie [coborârea în fântânã, ad inferos], reprezentând [începutul maturizãrii eroului]. Scena echivalează cu [un botez], căci prin apă fiul craiului primeşte [un alt nume şi o nouă identitate, un nou statut social]. Pentru erou, acesta este [punctul cel mai de jos în care l-a dus lipsa de experinţă]. [M Eliade] considera coborârea în Infern [echivalentă cu decapitarea protagonistului, moartea iniţiatică]. Această secvență reflectă primul stadiu al existenței mezinului: [cel de novice/ începător]. El devine [rob], pentru că nu [distinge clar valoarea de nonvaloare], pentru că trebuie să parcurgă [chinul suferinței „negre” până va deveni un stăpânitor matur și responsabil].
 
-*O secvență narativă relevantă pentru această tema complexă o constituie coborârea în [fântânã], ad inferos, din cauză că era „boboc de felul său”, reprezentând începutul maturizãrii eroului. Scena echivalează cu un botez, căci prin apă fiul craiului primeşte un alt nume şi o nouă identitate, un nou statut social. Pentru erou, acesta este punctul cel mai de jos în care l-a dus lipsa de experinţă. M [Eliade] considera coborârea în Infern echivalentă cu decapitarea protagonistului, moartea iniţiatică, o experienţă nouă. Această secvență reflectă primul stadiu al existenței mezinului: cel de novice/ începător. El devine rob, pentru că nu distinge clar valoarea de [nonvaloare], pentru că trebuie să parcurgă chinul suferinței „negre” până va deveni un stăpânitor matur și responsabil.*
+Se remarcă și un al doilea episod semnificativ care conturează personalitatea tânărului și pune în lumina cealaltă componentă a tematicii, [Răul învins de Bine]. Ca într-o [piesă de teatru], fata dezvăluie adevărata identitate a Spânului, acesta retează capul lui Harap-Alb, acuzându-l de încălcarea jurământului. Calul îl ucide pe Spân, aruncându-l din înaltul cerului, în vreme ce fata de împărat îl readuce la viață pe fiul craiului cu ajutorul obiectelor magice, [smicelele de măr dulce, apa vie şi apa moartă].
 
-Se remarcă și un al doilea episod semnificativ care conturează personalitatea tânărului și pune în lumina cealaltă componentă a tematicii, Răul învins de Bine. Ca într-o piesă de teatru, fata dezvăluie adevărata identitate a Spânului, acesta retează capul lui Harap-Alb, acuzându-l de încălcarea [jurământului]. Calul îl ucide pe Spân, aruncându-l din înaltul cerului, în vreme ce fata de împărat îl readuce la viață pe fiul craiului cu ajutorul obiectelor magice, [smicelele de măr dulce], apa vie şi apa moartă. Se încheie, simetric, aventura iniţiatică a protagonistului: prin [paloș] a primit robia, prin paloș își recapătă domnia, sabia devenind element de recurență.
+<b>Reper 3</b>
+Un element de structură esențial este [titlul nominal de tip analitic ce promite lectorului o „poveste” deosebită a maturizării] tânărului crai, un destin unicizat la nivel gramatical prin [substantivul articulat „povestea”]. 
 
-<h3>Reper 3</h3>
-Un element de structură esențial este [titlul] nominal de tip analitic ce promite lectorului o „poveste” deosebită a maturizării tânărului crai, un destin unicizat la nivel gramatical prin substantivul articulat „povestea”. Construcţia oximoronică „Harap-Alb” indică statutul de [slugă naivă], puritatea celui aflat la început de drum. În aceeași măsură este o sugestie a coexistenței Binelui și a Răului.
+Construcția [oximoronică] „Harap-Alb“ indică [statutul] de slugă naivă, [puritatea celui aflat la început de drum]. În aceeaşi măsură este o sugestie a coexistenţei [Binelui și a Răului]. Viziunea se concretizează în intenţia [moralizatoare a autorului care creionează destinul personajului pentru a ilustra teza maturizării crăișorului].
 
-Formula iniţială şi cea finală înrămează lumea pe care o comunică povestitorul. Incipitul conturează [cronotopul] specific poveștii ce debuteazã ex abrupto cu sintagma „Amu cicã era odatã într-o țară”. Indicele spațial „într-o țară” se combină cu cel temporal „odată” plasând evenimentele intr-un trecut nedeterminat, [illo tempore]. 
+Formula inițială și cea finală, aflate într-un raport de [complementaritate], [înrămează lumea] pe care o comunică povestitorul, pregătind ascultătorul [să intre în atmosfera de basm]. [Incipitul] conturează [cronotopul] specific poveştii ce debutează [ex abrupto] cu sintagma [„Amu cicã era odatã într-o țară”]. Indicele spațial [„într-o țară”] se combină cu cel temporal [„odată”] plasând evenimentele [într-un trecut nedeterminat, illo tempore]. Regionalismele [„amu”, „cică”] localizează întâmplările fantastice în lumea [humuleșteană a scriitorului]. 
 
-Narațiunea la persoana a [III-a] este desfășurată cronologic. Instanța epică este [omniscientă], omniprezentă, demiurgică. Naratorul nu rămâne indiferent, se face auzit prin pactul [narativ] cu cititorul, pus în valoare de formulele mediane de tip captatio [benevolentiae].
+Basmul are o [dublă ieșire]: primul tip [de final, deznodământul prezintă proba supremă, moartea și învierea], prin care eroul își redobândeşte condiția de împărat și este răsplătit cu o nuntă eternă. Al doilea final, [evocat prin ultima frază „Iar pe la noi, cine are bani bea şi mãnâncã, iarã cine nu, se uitã şi rabdã”] asociază forme verbale şi pronominale [de persoana I plural şi a III-a singular].
 
-Personajele nu au multiple însușiri [supranaturale]. Portretul fizic este schiţat din câteva linii, prin caracterizare [directă]. El se dovedește milos și plin de compasiune față de Sfânta [Duminică], de la care va primi ajutor divin de trei ori. 
+Naraţiunea la persoana a III-a este desfăşurată [cronologic, prin înlănțuirea secvențelor] epice, fiind dramatizată prin dialogul [ce dinamizează întâmplările, susține evoluția acțiunii și caracterizează personajele]. Instanța epică este [omniscientă, omniprezentă, demiurgică], dar deseori îşi părăsește această [mască a obiectivității] și devine un [povestitor] înconjurat de un [auditoriu implicat afectiv/emoțional]. Naratorul nu rămâne indiferent, se miră, se bucură, este insinuant, se face auzit şi simțit mai ales prin [pactul narativ cu cititorul, pus în valoare de formulele mediane de tip captatio benevolentiae].
 
-Asociat cu Don Quijote sau cu Hamlet, protagonistul s-a schimbat mult de când a plecat de acasă. Relația eroului cu antagonistul basmului, cu [Spânul] îi dezvăluie noblețea firii. Critica modernă afirmă că spânul reprezintă „răul [necesar]”: neiertător, îl supune pe crăițor în permanență unor probe periculoase.`;
+<b>Personajele</b>
+Personajele, instanțe fundamentale în textul epic, [„ființe de hârtie”], aşa cum le defineşte [teoria literară], se grupează în pozitive şi negative, principale şi secundare, [„plate” și “rotunde”], construcția lor realizându-se prin asocierea a două dimensiuni: [una exterioară, alta interioară]. 
+
+Basmul lui Creangă stabileşte numeroase puncte de contact cu realitatea, de aceea [protagonistul, Harap-Alb, nu are multiple însușiri supranaturale, știe doar să comunice cu ființele necuvântătoare]. Paginile basmului îi surprind [triplul statut social], de fiu de crai, de slugă „albă" şi naivă şi în final de împărat. Portretul fizic este schițat din câteva linii, [prin caracterizare directă se precizeazã doar cã are „o înfãţoşare mult mai plãcutã decât spânul”]. 
+
+El este surprins în latura/coordonata sa psihologică, iar frământările lui [determină naşterea unor noi centre de conflict]. Alcătuit din [lumini (calități)] și [umbre (defecte)], Harap-Alb acţionează în [situaţii excepţionale]. [Naivitatea] și deplina încredere în oameni, în ciuda interdicției părintelui său experimentat, se observă în scena a doua. [În ceea ce priveşte numele], eroul îl primeşte acum, în clipa coborârii în fântână, cea în care începe să trăiască provocările și pericolele adevăratei vieți. [Nu va mai fi Harap-Alb atunci când traseul inițiatic se încheie cu recompensarea și nunta]. Astfel, chiar titlul sugerează [caracterul de bildungsroman al operei]. 
+
+Mezinul craiului se defineşte şi indirect prin comportament. Textul ilustrează [sensibilitatea] sa atunci când, copil care îşi iubeşte şi îşi respectă tatăl, fiind jignit [„iese afarã în grãdinã şi începe a plânge în inima sa”]. Tot acum, în grădina palatului părintesc, el se dovedeşte [milos şi plin de compasiune față de Sfânta Duminică], căreia îi dăruieşte un bănuț şi de la care [va primi ajutor divin de trei ori]. 
+
+Din punctul de vedere [moral], el este [altruist şi partener devotat calului înaripat], dobândind toate calitățile necesare pentru a urma la tronul împărăției. Ajutat de fata de care se îndrăgostește, el îşi învinge rivalul și înviază, pentru a putea reveni la statutul de fiu de crai. [De acum, inițiatul, fostul novice cunoaște binele și răul, le-a trait pe amândouă], se va pune necondiționat în [slujba „albului”]. 
+
+Asociat cu [Don Quijote] sau cu [Hamlet], considerat [„erou fermecător”] sau, [dimpotrivă, „simplu”], lipsit de „merite personale", protagonistul s-a schimbat mult [de când a plecat de acasă]. Caracterul [i s-a modelat], a înţeles ce [e mila, a cunoscut iubirea, şi-a probat onoarea]. Spre deosebire de basmul popular, eroul se metamorfozează [„pe scenă”, în faţa cititorilor, confirmând ideea că omul este rezultatul propriilor acte]. 
+
+Relația eroului cu antagonistul basmului, duşmanul declarat al lui Harap-Alb, cu Spânul îi dezvăluie noblețea firii, dar şi temerile/fricile/vulnerabilitățile. Critica modernă afirmă că spânul reprezintă „răul necesar": neiertător, îl supune pe crăițor în permanență unor probe periculoase care produc efectul contrar, transformându-l într-un adevărat erou. În fața calului, tânărul se dovedeşte când neputincios, pesimist, descurajându-se repede în fața probelor tot mai grele date de Spân, când nerăbdător și superficial, pentru că îl loveşte de trei ori cu frâul peste cap când vine să mănânce jăratic. Nici în scena trecerii podului, unde veghează craiul tânărul nu dovedeşte prea mult curaj, fiindcă tot calul îl salvează atunci când se repede asupra „ursului".
+
+<b>Concluzie</b>
+În concluzie, basmul acesta definit de George Călinescu drept „o oglindire a vieții în mod fabulos" este un exemplu de creație cultă ce ilustrează viziunea despre lume a autorului, importanța valorilor spirituale în lupta împotriva răului.`;
 
     let correctAnswers = [];
 
@@ -198,17 +224,10 @@ Asociat cu Don Quijote sau cu Hamlet, protagonistul s-a schimbat mult de când a
         let i = 0;
         const formattedText = rawText.replace(/\[(.*?)\]/g, (match, word) => {
             correctAnswers.push(word.trim());
-            return `<input type="text" class="blank-input" data-index="${i++}" oninput="updateProgress()">`;
+            return `<span class="input-number">${i + 1}</span><input type="text" class="blank-input" data-index="${i++}" oninput="updateProgress()">`;
         });
         container.innerHTML = formattedText.replace(/\n/g, '<br>');
         loadSavedProgress();
-    }
-
-    function getProgressColor(percent) {
-        if (percent < 30) return "#ef4444"; 
-        if (percent < 60) return "#f97316"; 
-        if (percent < 85) return "#a3e635"; 
-        return "#22c55e"; 
     }
 
     function updateProgress() {
@@ -218,10 +237,8 @@ Asociat cu Don Quijote sau cu Hamlet, protagonistul s-a schimbat mult de când a
 
         inputs.forEach((input, idx) => {
             answersToSave.push(input.value); 
-            
             let userAns = normalize(input.value);
             let correctAns = normalize(correctAnswers[idx]);
-
             if (userAns === correctAns && userAns !== "") {
                 correctCount++;
                 input.style.color = "#10b981";
@@ -232,11 +249,11 @@ Asociat cu Don Quijote sau cu Hamlet, protagonistul s-a schimbat mult de când a
             }
         });
         
-        sessionStorage.setItem('elev_raspunsuri', JSON.stringify(answersToSave));
+        sessionStorage.setItem('elev_raspunsuri_t1', JSON.stringify(answersToSave));
         const percent = Math.round((correctCount / correctAnswers.length) * 100);
         const fill = document.getElementById('progress-fill');
         fill.style.width = percent + "%";
-        fill.style.backgroundColor = getProgressColor(percent);
+        fill.style.backgroundColor = percent < 30 ? "#ef4444" : (percent < 80 ? "#f97316" : "#22c55e");
         document.getElementById('progress-text').innerText = percent + "%";
 
         database.ref('clasa/' + studentName).set({
@@ -245,13 +262,13 @@ Asociat cu Don Quijote sau cu Hamlet, protagonistul s-a schimbat mult de când a
             scor: correctCount + "/" + correctAnswers.length,
             status: "În lucru",
             raspunsuri: answersToSave,
-            test_id: "test1.html",   // MODIFICARE: Identificator pentru profesor
-            test_nume: "Harap-Alb"   // MODIFICARE: Numele afisat profesorului
+            test_id: "test1.html",
+            test_nume: "Harap-Alb"
         });
     }
 
     function loadSavedProgress() {
-        const saved = sessionStorage.getItem('elev_raspunsuri');
+        const saved = sessionStorage.getItem('elev_raspunsuri_t1');
         if (saved) {
             const answers = JSON.parse(saved);
             const inputs = document.querySelectorAll('.blank-input');
@@ -262,7 +279,7 @@ Asociat cu Don Quijote sau cu Hamlet, protagonistul s-a schimbat mult de când a
 
     function resetTest() {
         if (confirm("Resetezi tot progresul?")) {
-            sessionStorage.removeItem('elev_raspunsuri');
+            sessionStorage.removeItem('elev_raspunsuri_t1');
             localStorage.removeItem('elev_nume');
             window.location.href = 'index.html';
         }
@@ -272,12 +289,7 @@ Asociat cu Don Quijote sau cu Hamlet, protagonistul s-a schimbat mult de când a
         const inputs = document.querySelectorAll('.blank-input');
         let totalCorrect = 0;
         inputs.forEach((input, idx) => {
-            if (normalize(input.value) === normalize(correctAnswers[idx])) {
-                totalCorrect++;
-                input.style.backgroundColor = "#ecfdf5";
-            } else {
-                input.style.backgroundColor = "#fef2f2";
-            }
+            if (normalize(input.value) === normalize(correctAnswers[idx])) totalCorrect++;
         });
 
         const finalPercent = Math.round((totalCorrect / correctAnswers.length) * 100);
