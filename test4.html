@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Atelier de Literatura - O scrisoare pierdută</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-color: #f8fafc; --card-bg: #ffffff; --primary: #4f46e5; --success: #10b981; --accent: #f1f5f9; }
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+        html, body { overscroll-behavior: none; user-select: none; -webkit-user-select: none; background-color: var(--bg-color); font-family: 'Inter', sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 900px; background: var(--card-bg); padding: 40px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); }
+        header { text-align: center; margin-bottom: 40px; border-bottom: 1px solid var(--accent); padding-bottom: 20px; }
+        h1 { font-size: 1.8rem; color: var(--primary); margin: 0; }
+        .progress-container { margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
+        .progress-bar-bg { flex-grow: 1; height: 12px; background: var(--accent); border-radius: 10px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background-color: #ef4444; border-radius: 10px; transition: width 0.5s ease; }
+        .content-area { font-family: 'Merriweather', serif; line-height: 2.2; font-size: 1.1rem; color: #334155; text-align: justify; }
+        .blank-input { font-family: 'Inter', sans-serif; border: none; border-bottom: 2px solid #cbd5e1; background-color: #f8fafc; padding: 2px 6px; font-size: 1rem; font-weight: 600; color: var(--primary); width: 180px; outline: none; text-align: center; border-radius: 4px; }
+        .input-number { font-size: 0.7rem; font-weight: 700; color: #94a3b8; margin-right: 2px; vertical-align: super; }
+        .actions { margin-top: 50px; display: flex; justify-content: center; gap: 15px; }
+        .btn { padding: 14px 28px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; border: none; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-secondary { background-color: var(--accent); color: #64748b; }
+        b { color: var(--primary); display: block; margin-top: 25px; font-size: 1.4rem; border-bottom: 2px solid var(--accent); }
+    </style>
+</head>
+<body onload="init()">
+<div class="app-container">
+    <header>
+        <h1>Evaluare: O scrisoare pierdută</h1>
+        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: ...</span>
+    </header>
+    <div class="progress-container">
+        <div class="progress-bar-bg"><div id="progress-fill"></div></div>
+        <span id="progress-text" style="font-size:0.9rem; font-weight:600;">0%</span>
+    </div>
+    <div id="content" class="content-area"></div>
+    <div class="actions">
+        <button class="btn btn-primary" onclick="finalCheck()">Finalizează</button>
+        <button class="btn btn-secondary" onclick="resetTest()">Resetează</button>
+    </div>
+</div>
+
+<script>
+    let studentName = localStorage.getItem('elev_nume');
+    if (!studentName) { window.location.href = 'index.html'; }
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2xOfKBy7FdA6uIyM0ij5ryHTop0yL3pg",
+      authDomain: "bacromana-6f3eb.firebaseapp.com",
+      databaseURL: "https://bacromana-6f3eb-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "bacromana-6f3eb",
+      storageBucket: "bacromana-6f3eb.firebasestorage.app",
+      messagingSenderId: "1087294677634",
+      appId: "1:1087294677634:web:d92bf75a8b58f7b351ca9b"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    document.getElementById('student-name-display').innerText = "Elev: " + studentName;
+
+    const rawText = `<b>Reper 1</b>
+    Destinul şi [modernizarea] literaturii române au fost marcate în [perioada Marilor Clasici] de personalitatea lui Titu Maiorescu, mentorul [„Junimii”]. Denumirea are atât semnificația de [„adepți ai clasicismului”], dar şi de [„modele”], căci adoptând acest program estetic, reprezentanții epocii devin [repere]: pentru [proza realistă, Ioan Slavici, pentru basmul cult, Ion Creangă, pentru opera dramatică, Ion Luca Caragiale și pentru lirica romantică, Mihai Eminescu].
+    „Comedie [realistă] de moravuri”, așa cum o definea [Titu Maiorescu], opera lui I.L.Caragiale dezvăluie contrastul dintre ceea ce vor să pară personajele și ceea ce sunt ele cu adevărat/ esență și aparență, impresionând prin faptul că întâmplările [veridice] se desfașoară în fața cititorului devenit spectator, prin toponimul [București]. In plus, coordonata realistă este observabilă prin [raportarea] individului la societate/ prin [condiționarea socială] și prin decuparea unor [„felii din viața”] personajelor care se încadrează în tipologii [verosimile]. Piesa este inspirată de un eveniment din actualitatea vremii: în 1883 au avut loc [alegeri pentru Adunarea Constituantă, în scopul alcătuirii unei noi Camere a Deputaţilor], ceea ce accentuează caracterul său [mimetic]/[mimesisul].
+
+    <b>Reper 2</b>
+    Termenul [„dramaturgie”] provine din limba franceză și desemnează operele cu formă [dialogată], asociate cu forme ale spectacolului de teatru, destinate a fi [reprezentate pe scenă].
+    Textul „O scrisoare pierdută”, scris în [1884] și publicat la [1 martie 1885] în revista „[Convorbiri literare]”, este o specie a genului dramatic, cu acțiune simplă, limitată în timp și spațiu, cu scop [moralizator] ce produce în final râsul cititorului sau al spectatorului prin conflictul [superficial].
+
+    <b>Reper 3</b>
+    Dominanta tematică se configurează pe [două dimensiuni], supratema [politică] 1 și cea a [vieții publice și de familie] 2.
+    O secvență narativă relevantă pentru această temă complexă o constituie cea dintâi scenă a operei. Comicul de [situație] se manifestă încă din momentul stabilirii numărului de [steaguri] puse în oraș de [Ghiță]. Tipătescu este aici [judecătorul amuzat] și Ghiță [incriminatul], concluzia reieșita din examinare fiind: [„dacă nu curge, pica”]. În această secvență abaterea de la valorile morale devine normă. Prefectul se folosește de avantajele puterii deținute, polițistul se declară în serviciul permanent al prefectului, pentru că soția lui îl îndeamnă la o atitudine lipsita de scrupule: „Ghiță, [pupă-l în bot și-i papa tot], că sătulul nu crede la al flămând”. Comicul de [limbaj] se remarcă prin prezenţa numeroaselor [greşeli de vocabular] ce ilustrează [incultura] personajelor, prin pronunţii greşite [„famelie”], [„fotel”], [„bambir”], prin oximoronul ca dovadă a ignoranței, a slugărniciei [„curat murdar”], prin ticul verbal, semn al limitării intelectuale [„curat”].
+    Se remarcă și un al doilea episod semnificativ: secvența în care conținutul biletului de amor este redat de Trahanache prefectului este semnificativă pentru comicul de [tipuri], căci Tipătescu este [prietenul cel mai bun al prezidentului], și în același timp, [amantul soției] lui. Originalitatea scenei demonstrează utilizarea unei [tehnici] moderne, [„teatrul în teatru”], căci prezidentul joacă rolul de [soț naiv], care crede că totul este o „plastografie”, o [imitație] de scrisoare. Calmul lui Tipătescu se transformă în pierderea rațiunii dezvăluind un Tipătescu [vulcanic]: [„Îl împușc! Îi dau foc!”]. Limbajul folosit în scrisoarea adresată Zoei accentueaza ridicolul: [„Nu mă aştepta şi vino tu la cocoşelul tău, care te adoră, ca totdeauna, şi te sărută de o mie de ori, Fănică”].
+
+    <b>Reper 4</b>
+    Titlul [analitic], tematic, propune un substantiv [articulat cu articol] nehotărât „o scrisoare” care [generalizează] moravurile societății. La început scrisoarea este expresia unui [sentiment intim]. Pe măsură ce acțiunea înaintează, ea își asociază noi semnificații. Va însemna [dorința] de a doborî un [adversary] politic „mișel”, va însemna șansa unei [ascensiuni] politice rapide, prin [șantaj], va fi simbolul [puterii]. Documentul îi servește lui Caragiale la ridicarea [măștilor] eroilor săi, pentru a-i înfățișa lectorului în [goliciunea] lor sufletească. Se ilustrează o teză a autorului care afirma că [„nimic nu arde mai rău pe ticăloşi”] decât râsul.
+
+    <b>Reper 5</b>
+    Acţiunea piesei este divizată după regulile [clasice] în [4] acte, evidențiindu-se [simetria] celui de-al doilea cu al patrulea prin numărul de scene: [9, 14, 7, 14], suma lor fiind [44]. Conflictele sunt de natură [exterioară].
+    Indicaţiile [scenice] sunt un element [specific] de compoziţie textului dramatic. Provenind din grecescul [„didaskalia”], ele au fost inițial un [caiet de replici] pe care regizorul îl oferea actorilor. În teatrul contemporan ele desemnează tot [ceea ce nu este rostit de actori]. Prin intermediul lor, Caragiale oferă indicații referitoare la componenta [nonverbală] și [paraverbală] a personajelor, la statutul social: Ştefan Tipătescu [„prefectul”], Zaharia Trahanache [„prezidentul”]. Pagina inițială cu rol de [incipit] este un fragment cu funcție [extratextuală] în care sunt trasate relațiile dintre protagoniști: „Zoe Trahanache, soția [celui de mai sus]”.
+
+    <b>Reper 6</b>
+    Cronotopul [realist] este precizat de autor în didascalii: [„în capitala unui județ de munte, în zilele noastre”]. Cel temporal, în sens [restrâns], trimite la [contemporanii] lui Caragiale, iar în sens [lărgit] la prezentul lectorului, un [„timp rotator”]. Toate evenimentele se derulează de-a lungul a [trei] zile, în perioada desfășurării alegerilor din anul [1883].
+
+    <b>Reper 7</b>
+    Ca orice text [classic], comedia își dezvăluie perfecțiunea prin [paralelismul] planurilor. În cel dintâi, este evocată traiectoria [primei] scrisori de amor, regăsită de Cetăţean care o înapoiază [„andrisantei”], închizând astfel [cercul].
+    Cealaltă „[scrisorică] de amor” este a unei doamne către o [„persoană însemnată”] şi găsită de Dandanache. Așadar, pierderea unei scrisori, ca fenomen [repetitive], sugerează neglijența unei lumi imorale.
+    Se evidențiază [cronologia] faptelor, dar în câteva situaţii perspectiva temporală este [discontinue]. Tehnica de construcţie a subiectului este aceea a [amplificării] treptate a conflictului, rezultând un [ghem] de complicaţii, care acumulează [progresiv] altele, ca un [bulgăre] de zăpadă.
+
+    <b>Personajele</b>
+    Personajele, instanțe fundamentale în textul dramatic, [„ființe de hârtie”], sunt surprinse în dimensiunea lor [exterioară], neînțelegerile dintre ele duc la naşterea unor noi centre de [conflict]. În studiul dedicat comediilor, [T. Maiorescu] observa că în spatele [„oricărei comedii se ascunde o tragedie”]. Firul evenimentelor scoate la lumină un șir nesfârșit al [defectelor] omenești. În această comedie niciun [personaj pozitiv] nu luminează scena. Astfel, criticul [Eugen Lovinescu] susține că teatrul lui Caragiale [„e întristător ca un spital de infirmități morale”].
+    Protagoniștii se subordonează unor [tipuri comice]: Tipătescu este tipul [amantului], Zoe ilustrează [cocheta] şi adulterina, Cațavencu, [politicianul] corupt, Dandanache, politicianul [ticălos]. Aceste tipologii sunt puse în lumină de [numele] expresive. Dandanache intră în bucluc ([dandana]), Trahanache este ușor de manipulat ([„trahanaua”]), sufixul [„-ache”] accentuând [mediocritatea] lor. Farfuridi și Brânzovenescu prin aspectul [culinary] sugerează perfecta [complementaritate].
+    Ştefan Tipătescu are statut social de [prefect], fiind fixat într-un [triunghi conjugal] imoral, bănuit de toţi şi transformat în [obiect de şantaj]. Din punct de vedere [moral], este o fire autoritară, administrează judeţul ca pe [propria moşie]. El dispune [arestarea] lui Cațavencu. Ştefan Tipătescu este îmbătat de [sentimental] propriei importanţe, aşa cum reiese din scena din [incipitul] piesei.
+    Caracterizarea [indirectă] se realizează prin gesturi şi comportament. Didascaliile îl prezintă [violent] şi impulsiv. Celelalte personaje îl caracterizează în mod [direct]: Zaharia Trahanache consideră că [„E băiat bun”], Nae Caţavencu îl consideră imoral în [Răcnetul Carpaţilor], ziar în care prefectul este numit [„vampir”]. Numele îl fixează în banalitate – „tip” se asociază cu sufixul comun [„-escu”], iar Ștefan ajunge în viața intimă [Fănică].`;
+
+    let correctAnswers = [];
+    function normalize(t) { 
+        if(!t) return "";
+        return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ț/g, "t").replace(/ș/g, "s")
+                .replace(/["'„”«»]/g, "").toLowerCase().trim(); 
+    }
+
+    function init() {
+        const container = document.getElementById('content');
+        let i = 0;
+        const formattedText = rawText.replace(/\[(.*?)\]/g, (match, word) => {
+            correctAnswers.push(word.trim());
+            return `<span class="input-number">${i + 1}</span><input type="text" class="blank-input" data-index="${i++}" oninput="updateProgress()">`;
+        });
+        container.innerHTML = formattedText.replace(/\n/g, '<br>');
+        loadSavedProgress();
+    }
+
+    function updateProgress() {
+        const inputs = document.querySelectorAll('.blank-input');
+        let correctCount = 0; let answersToSave = [];
+        inputs.forEach((input, idx) => {
+            answersToSave.push(input.value); 
+            if (normalize(input.value) === normalize(correctAnswers[idx]) && input.value !== "") {
+                correctCount++; input.style.color = "#10b981"; input.style.borderBottomColor = "#10b981";
+            } else { input.style.color = "#4f46e5"; input.style.borderBottomColor = "#cbd5e1"; }
+        });
+        const percent = Math.round((correctCount / correctAnswers.length) * 100);
+        document.getElementById('progress-fill').style.width = percent + "%";
+        document.getElementById('progress-text').innerText = percent + "%";
+        database.ref('clasa/' + studentName).set({ nume: studentName, progres: percent, scor: correctCount + "/" + correctAnswers.length, status: "În lucru", raspunsuri: answersToSave, test_id: "test4.html", test_nume: "O scrisoare pierdută" });
+        sessionStorage.setItem('elev_raspunsuri_t4', JSON.stringify(answersToSave));
+    }
+
+    function loadSavedProgress() {
+        const saved = sessionStorage.getItem('elev_raspunsuri_t4');
+        if (saved) {
+            const answers = JSON.parse(saved);
+            const inputs = document.querySelectorAll('.blank-input');
+            inputs.forEach((input, idx) => { if (answers[idx]) input.value = answers[idx]; });
+            updateProgress(); 
+        }
+    }
+
+    function resetTest() { if (confirm("Resetezi?")) { sessionStorage.removeItem('elev_raspunsuri_t4'); location.reload(); } }
+    function finalCheck() {
+        const inputs = document.querySelectorAll('.blank-input');
+        let totalCorrect = 0;
+        inputs.forEach((input, idx) => { if (normalize(input.value) === normalize(correctAnswers[idx])) totalCorrect++; });
+        database.ref('clasa/' + studentName).update({ status: "Finalizat", progres: Math.round((totalCorrect/correctAnswers.length)*100), scor: totalCorrect + "/" + correctAnswers.length });
+        alert("Rezultat salvat!");
+    }
+</script>
+</body>
+</html>
