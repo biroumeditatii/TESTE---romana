@@ -41,22 +41,13 @@
         .progress-fill { height: 100%; border-radius: 5px; transition: width 0.5s; }
         .card-footer { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; }
         .actions-row { display: flex; justify-content: flex-end; margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 10px; }
-
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
-        .modal-content { background-color: white; margin: 5vh auto; padding: 25px; border-radius: 24px; width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
+        .modal-content { background-color: white; margin: 5vh auto; padding: 25px; border-radius: 24px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
         .res-item { padding: 8px; border-bottom: 1px solid #f1f5f9; display: flex; flex-direction: column; }
         .res-correct { color: var(--success); font-weight: 700; }
         .res-wrong { color: var(--error); font-weight: 700; }
         .res-empty { color: var(--empty); font-weight: 700; }
         .res-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
-        
-        /* Efect de pulsare când se actualizează datele în modal */
-        .live-pulse { animation: pulse-blue 1s; }
-        @keyframes pulse-blue {
-            0% { background-color: transparent; }
-            50% { background-color: #dbeafe; }
-            100% { background-color: transparent; }
-        }
     </style>
 </head>
 <body>
@@ -66,8 +57,9 @@
             <table>
                 <thead><tr><th>Test</th><th>Acțiune</th></tr></thead>
                 <tbody>
-                    <tr><td>Test 1: Harap-Alb</td><td><button class="btn btn-launch" onclick="lanseazaTest('test1.html', 'Harap-Alb')">LANSEAZĂ</button></td></tr>
-                    <tr><td>Test 2: Moara cu noroc</td><td><button class="btn btn-launch" onclick="lanseazaTest('test2.html', 'Moara cu noroc')">LANSEAZĂ</button></td></tr>
+                    <tr><td>Harap-Alb</td><td><button class="btn btn-launch" onclick="lanseazaTest('test1.html', 'Harap-Alb')">LANSEAZĂ</button></td></tr>
+                    <tr><td>Moara cu noroc</td><td><button class="btn btn-launch" onclick="lanseazaTest('test2.html', 'Moara cu noroc')">LANSEAZĂ</button></td></tr>
+                    <tr><td>Luceafărul</td><td><button class="btn btn-launch" onclick="lanseazaTest('test3.html', 'Luceafărul')">LANSEAZĂ</button></td></tr>
                 </tbody>
             </table>
             <div style="margin-top: 20px; padding-top: 20px; border-top: 1px dashed #e2e8f0; display: flex; align-items: center; gap: 10px;">
@@ -103,14 +95,24 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // CHEI EXTRASE MANUAL
     const CHEI = {
-        "test1.html": ["modernizarea", "perioada Marilor Clasici", "Titu Maiorescu", "adepți ai clasicismului", "modele", "repere", "clasei de opere", "narațiunea", "schema opoziţionalã Bine-Rãu", "publicat în 1877", "Convorbiri literare", "tipar arhicunoscut", "cifra trei, superioritatea mezinului, cãlãtoria primejdioasã, probele, lupta finalã, recompensa, nunta", "Coordonata realist-psihologică", "maturizarea protagonistului", "dimensiunea sufletească", "adevărul, dreptatea, frumosul, iubirea", "Originalitatea textului", "nivelul limbajului", "de oralitate, de fraze rimate, de umor", "Alexandru Piru", "populară, eterna luptă dintre Bine și Rău", "formarea personalității celui care polarizează interesul epic", "coborârea în fântânã, ad inferos", "începutul maturizãrii eroului", "un botez", "un alt nume şi o nouă identitate, un nou statut social", "punctul cel mai de jos în care l-a dus lipsa de experinţă", "M Eliade", "echivalentă cu decapitarea protagonistului, moartea iniţiatică", "cel de novice/ începător", "rob", "distinge clar valoarea de nonvaloare", "chinul suferinței „negre” până va deveni un stăpânitor matur și responsabil", "Răul învins de Bine", "piesă de teatru", "smicelele de măr dulce, apa vie şi apa moartă", "titlul nominal de tip analitic ce promite lectorului o „poveste” deosebită a maturizării", "substantivul articulat „povestea”", "oximoronică", "statutul", "puritatea celui aflat la început de drum", "Binelui și a Răului", "moralizatoare a autorului care creionează destinul personajului pentru a ilustra teza maturizării crăișorului", "complementaritate", "înrămează lumea", "să intre în atmosfera de basm", "Incipitul", "cronotopul", "ex abrupto", "„Amu cicã era odatã într-o țară”", "„într-o țară”", "„odată”", "într-un trecut nedeterminat, illo tempore", "„amu”, „cică”", "humuleșteană a scriitorului", "dublă ieșire", "de final, deznodământul prezintă proba supremă, moartea și învierea", "evocat prin ultima frază „Iar pe la noi, cine are bani bea şi mãnâncã, iarã cine nu, se uitã şi rabdã”", "de persoana I plural şi a III-a singular", "cronologic, prin înlănțuirea secvențelor", "ce dinamizează întâmplările, susține evoluția acțiunii și caracterizează personajele", "omniscientă, omniprezentă, demiurgică", "mască a obiectivității", "povestitor", "auditoriu implicat afectiv/emoțional", "pactul narativ cu cititorul, pus în valoare de formulele mediane de tip captatio benevolentiae", "„ființe de hârtie”", "teoria literară", "„plate” și “rotunde”", "una exterioară, alta interioară", "protagonistul, Harap-Alb, nu are multiple însușiri supranaturale, știe doar să comunice cu ființele necuvântătoare", "triplul statut social", "prin caracterizare directă se precizeazã doar cã are „o înfãţoşare mult mai plãcutã decât spânul”", "determină naşterea unor noi centre de conflict", "lumini (calități)", "umbre (defecte)", "situaţii excepţionale", "Naivitatea", "În ceea ce priveşte numele", "Nu va mai fi Harap-Alb atunci când traseul inițiatic se încheie cu recompensarea și nunta", "caracterul de bildungsroman al operei", "sensibilitatea", "„iese afarã în grãdinã şi începe a plânge în inima sa”", "milos şi plin de compasiune față de Sfânta Duminică", "va primi ajutor divin de trei ori", "moral", "altruist şi partener devotat calului înaripat", "De acum, inițiatul, fostul novice cunoaște binele și răul, le-a trait pe amândouă", "slujba „albului”", "Don Quijote", "Hamlet", "„erou fermecător”", "dimpotrivă, „simplu”", "de când a plecat de acasă", "i s-a modelat", "e mila, a cunoscut iubirea, şi-a probat onoarea", "„pe scenă”, în faţa cititorilor, confirmând ideea că omul este rezultatul propriilor acte", "Spânul"],
-        "test2.html": ["modernizarea", "Marilor Clasici", "Titu Maiorescu", "Junimii", "adepți ai clasicismului", "modele", "repere", "Ioan Slavici", "Ion Creangă", "Ion Luca Caragiale", "Mihai Eminescu", "1881", "Novele din popor", "realismului psihologic", "Ioan Slavici", "mimesis", "felii de viață", "om-societate", "Ghiță", "bătrână", "alter egoul autorului", "verosimilitate", "Ineu, Arad, Fundureni", "Ana", "Ghiță", "Sămădăul", "descrierilor", "sobru/ impersonal", "al XIX-lea", "narațiunea", "epikos", "dimensiune medie", "conflict concentrat", "cronologic", "plan narativ", "asupra conturãrii lui Ghiță", "polarizeaza interesul epic", "relația obsesivă", "resorturilor intime", "radiografierea și sondarea psihicului", "supratema degradării umane sub semnul banului", "destinului schimbător", "confruntare dramatică", "conflict exterior", "Lică", "aspru, viclean", "unic stăpân al locurilor", "dârz și motivat", "la Moara cu noroc, nu putea să steie nimeni fără voia lui Lică", "tovarăş", "împrejurări", "șederea la Moara cu noroc depinde numai de bunul său plac", "călău-victimă", "deznodământul", "tragedia antică", "jocul porcarului", "crimă", "mințise", "treăpta a degradării morale", "coborârii în infern", "teamă, de suferință morală", "soțul n-o mai iubește", "să macine familia", "oamenilor lui Lică", "a fi dorit prea mult", "fatalității oarbe", "triunghiul de forță", "moartea în lanț", "hotarul dintre Bine și Rău", "foc", "oasele albe care ies din cenușa neagră", "morii care „macină” destine", "noroc", "malefic", "unei noi șanse", "aducător de ghinion", "analitică", "unicizează negativ locul", "hanul lui Sadoveanu", "moralizatoare", "bătrânei", "măsura în toate", "noaptea", "rãsãritul", "au loc în aceste intervale de timp", "persoana a III-a", "cronologic", "înlănțuirea", "dramatizată prin dialogul", "evoluția acțiunii", "personajele", "omniscientă", "cronologia", "17", "rama", "contrapunctul", "biserică", "Paște", "care, la Moara cu noroc începe", "uitat de Divinitate", "psihologic", "Sfântul Gheorghe și până la Paște", "corp sferoid", "circulară", "oraculară/premonitorie/ de anticipare", "provocarea destinului atrage pedepse grave", "experienţă de viaţã", "la echilibru", "predestinare", "Omul sa fie mulțumit cu sărăcia sa…nu bogăția, ci liniștea colibei tale te face fericit", "bătrânei", "reflector", "moralizatoare", "nu are să iasă bine", "supranaturală", "totul dinainte", "încalcă normele morale", "focului purificator", "epilogul", "pentru un nou început", "Apoi ea luă copiii și plecă mai departe", "instanțe fundamentale", "ființe de hârtie", "teoria literară", "plate” și “rotunde", "o dimensiune exterioară, alta interioară", "verosimili", "demonic", "romantică", "polarizează interesul epic", "realist-moralizatoare", "arivistul, dornicul de îmbogățire rapidă", "omul moral, pater familias", "dilematic", "imoral", "Sfântul Gheorghe", "balaur", "sumar", "puternic și umeros ca un taur", "Ana era tânără și frumoasa, (…), iar el însuși, înalt și spătos, o purta ca pe o pană", "gradual/gradat", "comportament", "căutări", "întrebări", "temeri", "oameni legii", "Divinitatea", "patima banului", "om e supus", "pluriperspectiva/tehnica oglinzilor paralele/tehnica cercurilor concentrice", "subordonare", "inferioritatea", "responsabil", "subordonat", "dezumanizarea, decãderea spiritualã şi moralã", "Tudor Vianu", "tot ce iese din limitele moralului sfârşeşte tragic", "călău – victimă", "zbuciumul sufletesc, alunecarea acestuia în obsesie", "parvenitului", "ezitant", "anatagonistul", "un om de 36 de ani, înalt, uscãţiv şi supt la faţã, cu mustaţã lungã, cu ochii mici şi verzi", "sămădău", "brutalitatea, viclenia, rãutatea", "pedeapsa divinã", "Acu’ m-a ajuns mânia lui Dumnezeu!", "Dupã faptã şi rãsplatã"]
+        "test1.html": ["modernizarea", "perioada Marilor Clasici", "Titu Maiorescu", "adepți ai clasicismului", "modele", "repere", "clasei de opere", "narațiunea", "schema opoziţionalã Bine-Rãu", "publicat în 1877", "Convorbiri literare", "tipar arhicunoscut", "cifra trei, superioritatea mezinului, cãlãtoria primejdioasã, probele, lupta finalã, recompensa, nunta", "Coordonata realist-psihologică", "maturizarea protagonistului", "dimensiunea sufletească", "adevărul, dreptatea, frumosul, iubirea", "Originalitatea textului", "nivelul limbajului", "de oralitate, de fraze rimate, de umor", "Alexandru Piru", "populară, eterna luptă dintre Bine și Rău", "formarea personalității celui care polarizează interesul epic", "coborârea în fântânã, ad inferos", "începutul maturizãrii eroului", "un botez", "un alt nume şi o nouă identitate, un nou statut social", "punctul cel mai de jos în care l-a dus lipsa de experinţă", "M Eliade", "echivalentă cu decapitarea protagonistului, moartea iniţiatică", "cel de novice/ începător", "rob", "distinge clar valoarea de nonvaloare", "chinul suferinței „negre” până va deveni un stăpânitor matur și responsabil", "Răul învins de Bine", "piesă de teatru", "smicelele de măr dulce, apa vie şi apa moartă", "titlul nominal de tip analitic ce promite lectorului o „poveste” deosebită a maturizării", "substantivul articulat „povestea”", "oximoronică", "statutul", "puritatea celui aflat la început de drum", "Binelui și a Răului", "moralizatoare a autorului care creionează destinul personajului pentru a ilustra teza maturizării crăișorului", "complementaritate", "înrămează lumea", "să intre în atmosfera de basm", "Incipitul", "cronotopul", "ex abrupto", "„Amu cicã era odatã într-o țară”", "„într-o țară”", "„odată”", "într-un trecut nedeterminat, illo tempore", "„amu”, „cică”", "humuleșteană a scriitorului", "dublă ieșire", "de final, deznodământul prezintă proba supremă, moartea și învierea", "evocat prin ultima frază „Iar pe la noi, cine are bani bea şi mãnâncã, iarã cine nu, se uitã şi rabdã”", "de persoana I plural şi a III-a singular", "cronologic, prin înlănțuirea secvențelor", "ce dinamizează întâmplările, susține evoluția acțiunii și caracterizează personajele", "omniscientă, omniprezentă, demiurgică", "mască a obiectivității", "povestitor", "auditoriu implicat afectiv/emoțional", "pactul narativ cu cititorul, pus în valoare de formulele mediane de tip captatio benevolentiae", "„ființe de hârtie”", "teoria literară", "„plate” și “rotunde”", "una exterioară, alta interioară", "protagonist, Harap-Alb, nu are multiple însușiri supranaturale, știe doar să comunice cu ființele necuvântătoare", "triplul statut social", "prin caracterizare directă se precizeazã doar cã are „o înfãţoşare mult mai plãcutã decât spânul”", "determină naşterea unor noi centre de conflict", "lumini (calități)", "umbre (defecte)", "situaţii excepţionale", "Naivitatea", "În ceea ce priveşte numele", "Nu va mai fi Harap-Alb atunci când traseul inițiatic se încheie cu recompensarea și nunta", "caracterul de bildungsroman al operei", "sensibilitatea", "„iese afarã în grãdinã şi începe a plânge în inima sa”", "milos şi plin de compasiune față de Sfânta Duminică", "va primi ajutor divin de trei ori", "moral", "altruist şi partener devotat calului înaripat", "inițiatul, fostul novice cunoaște binele și răul, le-a trait pe amândouă", "slujba „albului”", "Don Quijote", "Hamlet", "„erou fermecător”", "dimpotrivă, „simplu”", "de când a plecat de acasă", "i s-a modelat", "e mila, a cunoscut iubirea, şi-a probat onoarea", "„pe scenă”, în faţa cititorilor, confirmând ideea că omul este rezultatul propriilor acte", "Spânul"],
+        "test2.html": ["modernizarea", "Marilor Clasici", "Titu Maiorescu", "Junimii", "adepți ai clasicismului", "modele", "repere", "Ioan Slavici", "Ion Creangă", "Ion Luca Caragiale", "Mihai Eminescu", "1881", "Novele din popor", "realismului psihologic", "Ioan Slavici", "mimesis", "felii de viață", "om-societate", "Ghiță", "bătrână", "alter egoul autorului", "verosimilitate", "Ineu, Arad, Fundureni", "Ana", "Ghiță", "Sămădăul", "descrierilor", "sobru/ impersonal", "al XIX-lea", "narațiunea", "epikos", "dimensiune medie", "conflict concentrat", "cronologic", "plan narativ", "asupra conturãrii lui Ghiță", "polarizeaza interesul epic", "relația obsesivă", "resorturilor intime", "radiografierea și sondarea psihicului", "supratema degradării umane sub semnul banului", "destinului schimbător", "confruntare dramatică", "conflict exterior", "Lică", "aspru, viclean", "unic stăpân al locurilor", "dârz și motivat", "la Moara cu noroc, nu putea să steie nimeni fără voia lui Lică", "tovarăş", "împrejurări", "șederea la Moara cu noroc depinde numai de bunul său plac", "călău-victimă", "deznodământul", "tragedia antică", "jocul porcarului", "crimă", "mințise", "treăpta a degradării morale", "coborârii în infern", "teamă, de suferință morală", "soțul n-o mai iubește", "să macine familia", "oamenilor lui Lică", "a fi dorit prea mult", "fatalității oarbe", "triunghiul de forță", "moartea în lanț", "hotarul dintre Bine și Rău", "foc", "oasele albe care ies din cenușa neagră", "morii care „macină” destine", "noroc", "malefic", "unei noi șanse", "aducător de ghinion", "analitică", "unicizează negativ locul", "hanul lui Sadoveanu", "moralizatoare", "bătrânei", "măsura în toate", "noaptea", "rãsãritul", "au loc în aceste intervale de timp", "persoana a III-a", "cronologic", "înlănțuirea", "dramatizată prin dialogul", "evoluția acțiunii", "personajele", "omniscientă", "cronologia", "17", "rama", "contrapunctul", "biserică", "Paște", "care, la Moara cu noroc începe", "uitat de Divinitate", "psihologic", "Sfântul Gheorghe și până la Paște", "corp sferoid", "circulară", "oraculară/premonitorie/ de anticipare", "provocarea destinului atrage pedepse grave", "experienţă de viaţã", "la echilibru", "predestinare", "Omul sa fie mulțumit cu sărăcia sa…nu bogăția, ci liniștea colibei tale te face fericit", "bătrânei", "reflector", "moralizatoare", "nu are să iasă bine", "supranaturală", "totul dinainte", "încalcă normele morale", "focului purificator", "epilogul", "pentru un nou început", "Apoi ea luă copiii și plecă mai departe", "instanțe fundamentale", "ființe de hârtie", "teoria literară", "plate” și “rotunde", "o dimensiune exterioară, alta interioară", "verosimili", "demonic", "romantică", "polarizează interesul epic", "realist-moralizatoare", "arivistul, dornicul de îmbogățire rapidă", "omul moral, pater familias", "dilematic", "imoral", "Sfântul Gheorghe", "balaur", "sumar", "puternic și umeros ca un taur", "Ana era tânără și frumoasa, (…), iar el însuși, înalt și spătos, o purta ca pe o pană", "gradual/gradat", "comportament", "căutări", "întrebări", "temeri", "oameni legii", "Divinitatea", "patima banului", "om e supus", "pluriperspectiva/tehnica oglinzilor paralele/tehnica cercurilor concentrice", "subordonare", "inferioritatea", "responsabil", "subordonat", "dezumanizarea, decãderea spiritualã şi moralã", "Tudor Vianu", "tot ce iese din limitele moralului sfârşeşte tragic", "călău – victimă", "zbuciumul sufletesc, alunecarea acestuia în obsesie", "parvenitului", "ezitant", "anatagonistul", "un om de 36 de ani, înalt, uscãţiv şi supt la faţã, cu mustaţã lungã, cu ochii mici şi verzi", "sămădău", "brutalitatea, viclenia, rãutatea", "pedeapsa divinã", "Acu’ m-a ajuns mânia lui Dumnezeu!", "Dupã faptã şi rãsplatã"],
+        "test3.html": ["modernizarea", "perioada Marilor Clasici", "Titu Maiorescu", "„Junimii”", "„adepți ai clasicismului”", "„modele”", "repere", "proza realistă", "Ioan Slavici", "basmul cult, Ion Creangă", "dramatică, Ion Luca Caragiale", "lirica romantică, Mihai Eminescu", "„Almanahul România Jună”", "1883", "„Convorbiri literare”", "„Poezii”", "Titu Maiorescu", "„la cele mai înalte temperaturi”", "romantismului românesc și European", "„privirii”", "„luminii”", "„oglinzii”", "„visul”", "punte unică a unei imposibile legături între două lumi închise", "opoziție, antiteză", "romantică", "strofele 1-43", "strofele 86-98", "strofele 44-64", "strofele 65-85", "perfecţiunea cuplului şi compatibilitatea", "COINCIDENTIA OPPOSITORUM", "dualitatea ființei umane: apolinicul și dionisiacul", "2275", "Perpessicius", "56", "„soarta Luceafărului seamănă mult cu soarta geniului pe pământ”", "germanul Kunisch într-un memorial de călătorie prin Țările Române, „Fata în grădina de aur”", "finalul", "nedemn de poziția superioară a geniului care „nu are moarte, dar nici noroc”", "folclorică", "mitologică", "Zburătorului", "tulburã noaptea echilibrul fizic şi emoțional", "semidivinitate erotică", "creștine și precreștine, Fiul care se naște din Tatăl, puritatea și unicitatea Fecioarei", "Rig-Veda", "grecești", "semizeu, fiul lui Uranus, tatăl lui Helios – Soarele", "detaliul biografic, viața lui Eminescu ridicată la rang de simbol", "ideea filozofică", "„cunoaște-te pe tine însuți”", "„Lumea ca voință și reprezentare”", "„Critica rațiunii pure”", "epicului, liricului și dramaticului", "Tudor Vianu", "structurã epicã a unei poveşti de dragoste", "dramatice", "sens liric-filosofic înalt", "„o sinteză a categoriilor lirice” eminesciene", "contrarilor", "poem liric obiectiv", "piese de teatru", "Nicolae Manolescu", "„voci lirice”", "paturi „măști”", "Tudor Vianu", "geniul atras de lumea muritoare", "Cătălin", "Luceafărului", "poet", "ilustrarea omului comun", "iubirea, timpul bivalent -universal și individual-, cosmosul, natura", "condiției omului de geniu", "erotica", "oniric", "invocații", "paralelismul sintactic", "ceremonial/ un ritual", "ad inferos", "neptuniană", "„Rig-Veda”", "Zburător", "„mortului frumos”", "oximoron", "demonic", "înger și demon", "65-85", "călătoria intergalactică", "dialogul cu Demiurgul", "Hyperion", "divină", "moartea", "desprinderea sa de cer ar duce la haos", "narativ", "formula specifică", "semnul unui timp nedeterminat", "tempore", "Și era una la părinți/ Și mândră-n toate cele/ Cum e Fecioara intre sfinți/ Și luna între stele", "simetrică", "identice", "Cobori în jos, luceafãr blând,/ Alunecând pe-o razã/ Pãtrunde-n casã şi în gând/ Şi viaţa-mi lumineazã", "Cobori în jos, luceafãr blând,/ Alunecând pe-o razã/ Pãtrunde-n codru şi în gând/ Norocu-mi lumineazã", "Casa", "codru", "viaţa, noroc", "Schopenhauer", "moarte, dar nici noroc", "structură sintetică", "articulat hotărât", "individualiza/ uniciza", "luceafăr", "luciferus", "Hyperion", "cel care merge pe deasupra", "românească", "„stea a ciobanului”", "Venus", "iraniană", "„strălucirea pură”"]
     };
 
-    let activeStudentListener = null; // Listenerul curent pentru modalul deschis
+    let activeStudentListener = null;
 
-    function normalize(t) { return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ț/g, "t").replace(/ș/g, "s").toLowerCase().trim(); }
+    // FUNCȚIA NORMALIZE ACTUALIZATĂ PENTRU GHILIMELE
+    function normalize(t) { 
+        if(!t) return "";
+        return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/ț/g, "t").replace(/ș/g, "s")
+            .replace(/["'„”«»]/g, "") // STERGE GHILIMELELE
+            .toLowerCase().trim(); 
+    }
+
     function lanseazaTest(id, nume) { db.ref('setari').set({ test_activ: true, test_id: id, test_nume: nume }); }
     function opresteTestul() { db.ref('setari/test_activ').set(false); }
     function stergeTotiElevii() { if(confirm("Ștergi lista?")) db.ref('clasa').remove(); }
@@ -128,33 +130,26 @@
     }
 
     function deschideDetalii(id) {
-        if (activeStudentListener) activeStudentListener.off(); // Curățăm orice listener vechi
-
+        if (activeStudentListener) activeStudentListener.off();
         const body = document.getElementById('modalBody');
         body.innerHTML = 'Se încarcă datele live...';
         document.getElementById('resModal').style.display = 'block';
-
         activeStudentListener = db.ref('clasa/' + id);
         activeStudentListener.on('value', snap => {
             const s = snap.val();
             if(!s || !s.raspunsuri) { body.innerHTML = 'Elevul nu a început încă.'; return; }
-            
             const key = CHEI[s.test_id] || CHEI["test1.html"];
             document.getElementById('modalStudentName').innerText = s.nume;
-            
             let html = '';
             const rArr = Array.isArray(s.raspunsuri) ? s.raspunsuri : Object.values(s.raspunsuri);
-            
             rArr.forEach((r, i) => {
                 const correctStr = key[i] || "";
                 let statusClass = "";
                 let displayVal = r || "(gol)";
-
                 if (!r || r.trim() === "") statusClass = "res-empty";
                 else if (normalize(r) === normalize(correctStr)) statusClass = "res-correct";
                 else statusClass = "res-wrong";
-
-                html += `<div class="res-item live-pulse">
+                html += `<div class="res-item">
                     <span>${i+1}: <span class="${statusClass}">${displayVal}</span></span>
                     ${normalize(r) !== normalize(correctStr) ? `<span class="res-label">Corect: ${correctStr}</span>` : ''}
                 </div>`;
@@ -164,18 +159,17 @@
     }
 
     function inchideModal() {
-        if (activeStudentListener) {
-            activeStudentListener.off(); // Oprim ascultarea când închidem fereastra
-            activeStudentListener = null;
-        }
+        if (activeStudentListener) { activeStudentListener.off(); activeStudentListener = null; }
         document.getElementById('resModal').style.display = 'none';
     }
 
     db.ref('setari').on('value', snap => {
         const d = snap.val();
         const el = document.getElementById('current-status');
-        el.innerText = (d && d.test_activ) ? "ACTIV: " + d.test_nume : "INACTIV";
-        el.className = (d && d.test_activ) ? "status-badge active-now" : "status-badge";
+        if(d) {
+            el.innerText = d.test_activ ? "ACTIV: " + d.test_nume : "INACTIV";
+            el.className = d.test_activ ? "status-badge active-now" : "status-badge";
+        }
     });
 
     db.ref('clasa').on('value', snapshot => {
@@ -201,7 +195,6 @@
                 </div>`;
         }
     });
-
     window.onclick = function(event) { if (event.target == document.getElementById('resModal')) inchideModal(); }
 </script>
 </body>
