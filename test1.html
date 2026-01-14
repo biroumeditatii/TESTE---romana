@@ -31,7 +31,7 @@
 <div class="app-container">
     <header>
         <h1>Evaluare: Povestea lui Harap-Alb</h1>
-        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: ...</span>
+        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: Se încarcă...</span>
     </header>
     <div class="progress-container">
         <div class="progress-bar-bg"><div id="progress-fill"></div></div>
@@ -70,13 +70,13 @@
     [Coordonata realist-psihologică] reorganizează acest tipar şi prezintă [maturizarea protagonistului], accentuând [dimensiunea sufletească] a celui care luptă pentru apărarea unor valori morale ca [adevărul, dreptatea, frumosul, iubirea]. [Originalitatea textului] este observabilă și la [nivelul limbajului] dominat [de oralitate, de fraze rimate, de umor]. Pornind de la opinia critică a lui [Alexandru Piru].
 
     <b>Reper 2</b>
-    Dominanta tematică se configurează pe două dimensiuni: cea [populară] şi cea cultă, [formarea personalității celui care polarizează interesul epic]. 
+    Dominanta tematică se configurează pe două dimensiuni: cea [popular] şi cea cultă, [formarea personalității celui care polarizează interesul epic]. 
     O secvenţă narativă relevantă pentru această tema complexă o constituie [coborârea în fântânã, ad inferos], reprezentând [începutul maturizãrii eroului]. Scena echivalează cu [un botez], căci prin apă fiul craiului primeşte [un alt nume şi o nouă identitate]. Pentru erou, acesta este [punctul cel mai de jos în care l-a dus lipsa de experinţă]. [M Eliade] considera coborârea în Infern [echivalentă cu decapitarea protagonistului, moartea iniţiatică]. Această secvență reflectă primul stadiu al existenței mezinului: [cel de novice/ începător]. El devine [rob], pentru că nu [distinge clar valoarea de nonvaloare], pentru că trebuie să parcurgă [chinul suferinței „negre” până va deveni un stăpânitor matur și responsabil].
     Se remarcă și un al doilea episod semnificativ care conturează personalitatea tânărului și pune în lumina cealaltă componentă a tematicii, [Răul învins de Bine]. Ca într-o [piesă de teatru], fata dezvăluie adevărata identitate a Spânului, acesta retează capul lui Harap-Alb, acuzându-l de încălcarea jurământului. Calul îl ucide pe Spân, aruncându-l din înaltul cerului, în vreme ce fata de împărat îl readuce la viață pe fiul craiului cu ajutorul obiectelor magice, [smicelele de măr dulce, apa vie şi apa moartă].
 
     <b>Reper 3</b>
     Un element de structură esențial este [titlul nominal de tip analitic ce promite lectorului o „poveste” deosebită a maturizării] tânărului crai, un destin unicizat la nivel gramatical prin [substantivul articulat „povestea”]. 
-    Construcția [oximoronică] „Harap-Alb“ indică [statutul] de slugă naivă, [puritatea celui aflat la început de drum]. În aceeaşi măsură este o sugestie a coexistenţei [Binelui și a Răului].
+    Construcția [oximoronică] „Harap-Alb“ indică [statutul] de slugă naivă, [puritatea celui aflat la început de drum]. În aceeaşi măsură este o sugestie a coexistenţei [Binelui și a Răului]. Viziunea se concretizează în intenţia [moralizatoare a autorului].
 
     <b>Reper 4</b>
     Formula inițială și cea finală, aflate într-un raport de [complementaritate], [înrămează lumea] pe care o comunică povestitorul, pregătind ascultătorul [să intre în atmosfera de basm]. [Incipitul] conturează [cronotopul] specific poveştii ce debutează [ex abrupto] cu sintagma [„Amu cicã era odatã într-o țară”]. Indicele spațial [„într-o țară”] se combină cu cel temporal [„odată”] plasând evenimentele [într-un trecut nedeterminat, illo tempore]. Regionalismele [„amu”, „cică”] localizează întâmplările fantastice în lumea [humuleșteană a scriitorului]. 
@@ -87,7 +87,7 @@
 
     <b>Personajele</b>
     Personajele, instanțe fundamentale în textul epic, [„ființe de hârtie”], aşa cum le defineşte [teoria literară], se grupează în pozitive şi negative, principale şi secundare, [„plate” și “rotunde”], construcția lor realizându-se prin asocierea a două dimensiuni: [una exterioară, alta interioară]. 
-    Basmul lui Creangă stabileşte numeroase puncte de contact cu realitatea, de aceea [protagonistul, Harap-Alb, nu are multiple însușiri supranaturale]. Paginile basmului îi surprind [triplul statut social], de fiu de crai, de slugă „albă" şi naivă şi în final de împărat. Portretul fizic este schițat din câteva linii, [prin caracterizare directă]. 
+    Basmul lui Creangă stabileşte numeroase puncte de contact cu realitatea, de aceea [protagonistul, Harap-Alb, nu are multiple însușiri supranaturale, știe doar să comunice cu ființele necuvântătoare]. Paginile basmului îi surprind [triplul statut social], de fiu de crai, de slugă „albă" şi naivă şi în final de împărat. Portretul fizic este schițat din câteva linii, [prin caracterizare directă]. 
     El este surprins în latura/coordonata sa psihologică, iar frământările lui [determină naşterea unor noi centre de conflict]. Alcătuit din [lumini] și [umbre], Harap-Alb acţionează în [situaţii excepţionale]. [Naivitatea] și deplina încredere în oameni, în ciuda interdicției părintelui său experimentat, se observă în scena a doua. 
     În ceea ce priveşte [numele], eroul îl primeşte acum, în clipa coborârii în fântână, cea în care începe să trăiască provocările adevăratei vieți. [Nu va mai fi Harap-Alb atunci când traseul inițiatic se încheie]. Astfel, chiar titlul sugerează [caracterul de bildungsroman al operei]. 
 
@@ -102,13 +102,27 @@
 
     let correctAnswers = [];
 
+    // LOGICA DE NORMALIZARE (IGNORĂ PUNCTUAȚIA ȘI GHILIMELELE)
     function normalize(t) { 
         if(!t) return "";
         return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            .replace(/ț/g, "t").replace(/ș/g, "s")
-            .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"'„”«»]/g, "") 
-            .replace(/\s{2,}/g," ") 
-            .toLowerCase().trim(); 
+                .replace(/ț/g, "t").replace(/ș/g, "s")
+                .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"'„”«»]/g, "") 
+                .replace(/\s{2,}/g," ").toLowerCase().trim(); 
+    }
+
+    // LOGICA DE VERIFICARE FLEXIBILĂ
+    function isAnswerCorrect(userVal, correctVal) {
+        let normUser = normalize(userVal);
+        if (normUser === "") return false;
+
+        if (correctVal.includes('/')) {
+            let parts = correctVal.split('/');
+            let normParts = parts.map(p => normalize(p));
+            return normParts.includes(normUser) || normUser === normalize(correctVal.replace(/\//g, ', '));
+        }
+
+        return normUser === normalize(correctVal);
     }
 
     function init() {
@@ -127,14 +141,17 @@
         let correctCount = 0; let answersToSave = [];
         inputs.forEach((input, idx) => {
             answersToSave.push(input.value); 
-            if (normalize(input.value) === normalize(correctAnswers[idx]) && input.value !== "") {
+            if (isAnswerCorrect(input.value, correctAnswers[idx])) {
                 correctCount++; input.style.color = "#10b981"; input.style.borderBottomColor = "#10b981";
             } else { input.style.color = "#4f46e5"; input.style.borderBottomColor = "#cbd5e1"; }
         });
         const percent = Math.round((correctCount / correctAnswers.length) * 100);
         document.getElementById('progress-fill').style.width = percent + "%";
         document.getElementById('progress-text').innerText = percent + "%";
-        database.ref('clasa/' + studentName).set({ nume: studentName, progres: percent, scor: correctCount + "/" + correctAnswers.length, status: "În lucru", raspunsuri: answersToSave, test_id: "test1.html", test_nume: "Harap-Alb" });
+        database.ref('clasa/' + studentName).set({ 
+            nume: studentName, progres: percent, scor: correctCount + "/" + correctAnswers.length, 
+            status: "În lucru", raspunsuri: answersToSave, test_id: "test1.html", test_nume: "Harap-Alb" 
+        });
         sessionStorage.setItem('elev_raspunsuri_t1', JSON.stringify(answersToSave));
     }
 
@@ -149,11 +166,16 @@
     }
 
     function resetTest() { if (confirm("Resetezi?")) { sessionStorage.removeItem('elev_raspunsuri_t1'); location.reload(); } }
+    
     function finalCheck() {
         const inputs = document.querySelectorAll('.blank-input');
-        let totalCorrect = 0;
-        inputs.forEach((input, idx) => { if (normalize(input.value) === normalize(correctAnswers[idx])) totalCorrect++; });
-        database.ref('clasa/' + studentName).update({ status: "Finalizat", progres: Math.round((totalCorrect/correctAnswers.length)*100), scor: totalCorrect + "/" + correctAnswers.length });
+        let total = 0;
+        inputs.forEach((input, idx) => { if (isAnswerCorrect(input.value, correctAnswers[idx])) total++; });
+        database.ref('clasa/' + studentName).update({ 
+            status: "Finalizat", 
+            progres: Math.round((total/correctAnswers.length)*100), 
+            scor: total + "/" + correctAnswers.length 
+        });
         alert("Rezultat salvat!");
     }
 </script>
