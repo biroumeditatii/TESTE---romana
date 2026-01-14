@@ -62,7 +62,6 @@
     const database = firebase.database();
     document.getElementById('student-name-display').innerText = "Elev: " + studentName;
 
-    // 1. MONITORIZARE STARE TEST (Dacă profesorul oprește sau schimbă testul)
     database.ref('setari').on('value', snap => {
         const d = snap.val();
         if (!d || d.test_activ === false || d.test_id !== "test1.html") {
@@ -70,7 +69,6 @@
         }
     });
 
-    // 2. CREĂM ELEVUL ÎN DB ȘI ABIA APOI ACTIVĂM SENZORUL
     database.ref('clasa/' + studentName).update({
         nume: studentName, status: "În lucru", test_id: "test1.html", test_nume: "Harap-Alb"
     }).then(() => {
@@ -116,17 +114,7 @@
 
     let correctAnswers = [];
     function normalize(t) { if(!t) return ""; return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ț/g, "t").replace(/ș/g, "s").replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"'„”«»]/g, "").replace(/\s{2,}/g," ").toLowerCase().trim(); }
-
-    function isAnswerCorrect(userVal, correctVal) {
-        let normUser = normalize(userVal);
-        if (normUser === "") return false;
-        if (correctVal.includes('/')) {
-            let parts = correctVal.split('/');
-            return parts.some(p => normalize(p) === normUser) || normUser === normalize(correctVal.replace(/\//g, ', '));
-        }
-        return normUser === normalize(correctVal);
-    }
-
+    function isAnswerCorrect(u, c) { let nU = normalize(u); if (nU === "") return false; if (c.includes('/')) { let p = c.split('/'); return p.some(x => normalize(x) === nU) || nU === normalize(c.replace(/\//g, ', ')); } return nU === normalize(c); }
     function init() {
         const container = document.getElementById('content');
         let i = 0;
@@ -137,7 +125,6 @@
         container.innerHTML = formattedText.replace(/\n/g, '<br>');
         loadSavedProgress();
     }
-
     function updateProgress() {
         const inputs = document.querySelectorAll('.blank-input');
         let correctCount = 0; let answersToSave = [];
@@ -153,7 +140,6 @@
         database.ref('clasa/' + studentName).update({ progres: percent, scor: correctCount + "/" + correctAnswers.length, raspunsuri: answersToSave });
         sessionStorage.setItem('elev_raspunsuri_t1', JSON.stringify(answersToSave));
     }
-
     function loadSavedProgress() {
         const saved = sessionStorage.getItem('elev_raspunsuri_t1');
         if (saved) {
@@ -163,9 +149,7 @@
             updateProgress(); 
         }
     }
-
     function resetTest() { if (confirm("Resetezi?")) { sessionStorage.removeItem('elev_raspunsuri_t1'); location.reload(); } }
-    
     function finalCheck() {
         const inputs = document.querySelectorAll('.blank-input');
         let total = 0;
