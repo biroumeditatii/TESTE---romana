@@ -62,29 +62,6 @@
     const database = firebase.database();
     document.getElementById('student-name-display').innerText = "Elev: " + studentName;
 
-    // 1. VERIFICĂM DACĂ TESTUL ESTE LANȘAT DE PROFESOR
-    database.ref('setari').on('value', snap => {
-        const d = snap.val();
-        if (!d || d.test_activ === false || d.test_id !== "test1.html") {
-            window.location.href = 'index.html';
-        }
-    });
-
-    // 2. CREĂM ELEVUL ÎN DB ȘI ABIA APOI ACTIVĂM "SENZORUL" DE ȘTERGERE
-    database.ref('clasa/' + studentName).update({
-        nume: studentName,
-        status: "În lucru",
-        test_id: "test1.html",
-        test_nume: "Harap-Alb"
-    }).then(() => {
-        // Confirmare creare: Acum ascultăm dacă profesorul ne șterge din listă
-        database.ref('clasa/' + studentName).on('value', snap => {
-            if (!snap.exists()) {
-                window.location.href = 'index.html';
-            }
-        });
-    });
-
     const rawText = `<b>Introducere</b>
     Destinul şi [modernizarea] literaturii române au fost marcate în [perioada Marilor Clasici] de personalitatea lui [Titu Maiorescu]. Denumirea are atât semnificația de [„adepți ai clasicismului”], dar şi de [„modele”], căci adoptând acest program estetic, reprezentanții epocii devin [repere].
 
@@ -118,10 +95,14 @@
     Din punctul de vedere [moral], el este [altruist şi partener devotat calului înaripat], dobândind toate calitățile necesare. Ajutat de fata de care se îndrăgostește, el îşi învinge rivalul și înviază. [De acum, inițiatul cunoaște binele și răul], se va pune necondiționat în [slujba „albului”]. 
 
     Asociat cu [Don Quijote] sau cu [Hamlet], considerat [„erou fermecător”] sau, [„simplu”], lipsit de „merite personale", protagonistul s-a schimbat mult [de când a plecat de acasă]. Caracterul [i s-a modelat], a înţeles ce [e mila]. Spre deosebire de basmul popular, eroul se metamorfozează [„pe scenă”]. 
-    Relația eroului cu antagonistul basmului, cu [Spânul] îi dezvăluie noblețea firii. Critica modernă afirmă că spânul reprezintă „[răul necesar]”: neiertător, îl supune pe crăițor în permanență unor probe periculoase. În fața calului, tânărul se dovedeşte când [neputincios, pesimist], când [nerăbdător și superficial]. Nici în scena trecerii podului tânărul nu dovedeşte [prea mult curaj], fiindcă tot [calul îl salvează].`;
+    Relația eroului cu antagonistul basmului, cu [Spânul] îi dezvăluie noblețea firii. Critica modernă afirmă că spânul reprezintă „[răul necesar]”: neiertător, îl supune pe crăițor în permanență unor probe periculoase. În fața calului, tânărul se dovedeşte când [neputincios, pesimist], când [nerăbdător și superficial]. Nici în scena trecerii podului tânărul nu dovedeşte [prea mult curaj], fiindcă tot [calul îl salvează].
+
+    <b>Concluzie</b>
+    În concluzie, basmul acesta definit de George Călinescu drept „o oglindire a vieții în mod fabulos" este un exemplu de creație cultă ce ilustrează viziunea despre lume a autorului.`;
 
     let correctAnswers = [];
 
+    // LOGICA DE NORMALIZARE (IGNORĂ PUNCTUAȚIA ȘI GHILIMELELE)
     function normalize(t) { 
         if(!t) return "";
         return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -130,13 +111,17 @@
                 .replace(/\s{2,}/g," ").toLowerCase().trim(); 
     }
 
+    // LOGICA DE VERIFICARE FLEXIBILĂ
     function isAnswerCorrect(userVal, correctVal) {
         let normUser = normalize(userVal);
         if (normUser === "") return false;
+
         if (correctVal.includes('/')) {
             let parts = correctVal.split('/');
-            return parts.some(p => normalize(p) === normUser) || normUser === normalize(correctVal.replace(/\//g, ', '));
+            let normParts = parts.map(p => normalize(p));
+            return normParts.includes(normUser) || normUser === normalize(correctVal.replace(/\//g, ', '));
         }
+
         return normUser === normalize(correctVal);
     }
 
@@ -163,11 +148,9 @@
         const percent = Math.round((correctCount / correctAnswers.length) * 100);
         document.getElementById('progress-fill').style.width = percent + "%";
         document.getElementById('progress-text').innerText = percent + "%";
-        
-        database.ref('clasa/' + studentName).update({ 
-            progres: percent, 
-            scor: correctCount + "/" + correctAnswers.length, 
-            raspunsuri: answersToSave 
+        database.ref('clasa/' + studentName).set({ 
+            nume: studentName, progres: percent, scor: correctCount + "/" + correctAnswers.length, 
+            status: "În lucru", raspunsuri: answersToSave, test_id: "test1.html", test_nume: "Harap-Alb" 
         });
         sessionStorage.setItem('elev_raspunsuri_t1', JSON.stringify(answersToSave));
     }
