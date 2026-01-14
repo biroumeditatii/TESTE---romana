@@ -62,7 +62,7 @@
     const database = firebase.database();
     document.getElementById('student-name-display').innerText = "Elev: " + studentName;
 
-    // 1. MONITORIZARE STARE TEST (Dacă profesorul oprește sau schimbă testul)
+    // 1. VERIFICĂM DACĂ TESTUL ESTE LANȘAT DE PROFESOR
     database.ref('setari').on('value', snap => {
         const d = snap.val();
         if (!d || d.test_activ === false || d.test_id !== "test1.html") {
@@ -70,14 +70,14 @@
         }
     });
 
-    // 2. ÎNREGISTRARE IMEDIATĂ (Previne kick-ul instant)
+    // 2. CREĂM ELEVUL ÎN DB ȘI ABIA APOI ACTIVĂM "SENZORUL" DE ȘTERGERE
     database.ref('clasa/' + studentName).update({
         nume: studentName,
         status: "În lucru",
         test_id: "test1.html",
         test_nume: "Harap-Alb"
     }).then(() => {
-        // Activăm monitorizarea de ștergere DOAR după ce elevul a fost creat în DB
+        // Confirmare creare: Acum ascultăm dacă profesorul ne șterge din listă
         database.ref('clasa/' + studentName).on('value', snap => {
             if (!snap.exists()) {
                 window.location.href = 'index.html';
