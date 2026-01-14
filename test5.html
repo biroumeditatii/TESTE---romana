@@ -67,7 +67,7 @@
     Simbolismul este un curent literar [european], apărut ca reacţie la adresa excesului [sentimental] al [romantismului]. În limba greacă „[symbolon]” este echivalentul „[semnului]”, deci lirica simbolistă este una a descifrării [semnelor]. Se remarcă preferinţa pentru [corespondențe] şi [sinestezii], asocieri spontane de senzaţii [vizuale, olfactive, auditive și tactile]. Poezia simbolistă devine o [artă a sugestiei], preferându-se textele scrise în vers [liber], eliberate de regulile/rigorile versificaţiei [clasice]. Simbolismul [autentic] în literatura română se instaurează prin activitatea literară a lui [George Bacovia], dar fusese teoretizat de [Alexandru Macedonski] în articolele sale [Poezia Viitorului] şi [Despre logica poeziei].
 
     <b>Reper 2</b>
-    Creaţia literară „Plumb” este o [artă poetică] simbolistă, exprimând viziunea despre lume a autorului, într-un [limbaj] literar care-l particularizează. Ea deschide [volumul de debut], cu acelaşi nume, apărut în [1916], o perioadă tulbure, deoarece România se pregătea să intre în [Primul Război Mondial]. Poziţia ei privilegiată îi demonstrează statutul de [text-program], cheie de [interpretare] a unui univers liric monoton. Ea se înscrie în universul liric specific bacovian, al „[atmosferei de plumb], în care pluteşte [obsesia morţii şi o descompunere a fiinţei organice]” (Eugen Lovinescu).
+    Creaţia literară „Plumb” este o [artă poetică] simbolistă, exprimând viziunea despre lume a autorului, într-un [limbaj] literar care-l particularizează. Ea deschide [volumul de debut], cu acelaşi nume, apărut în [1916], o perioadă tulbure, deoarece România se pregătea să intre în [Primul Război Mondial]. Poziţia ei privilegiată îi demonstrează statutul de [text-program], cheie de [interpretare] a unui univers liric monoton. Ea se înscrie în universul liric specific bacovian, al „[atmosferei de plumb], in care pluteşte [obsesia morţii şi o descompunere a fiinţei organice]” (Eugen Lovinescu).
     Dominanta tematică se configurează pe două dimensiuni: [condiţia] de (con)damnat a poetului într-o societate superficială, supusă [morții] şi [descompunerii] şi solitudinea lui în această lume [pustie și rece ca un cavou].
     Prima secvenţă lirică pune în evidenţă cea dintâi coordonată a tematicii și creionează planul [exterior] sufocant. „Plumbul”, „somnul”, „vântul” sunt simboluri ale degradării. În lirica românească, a vieţui într-un [cavou] rămâne o reprezentare legată de numele lui George Bacovia. Spaţiul [strâmt], mortuar este echivalentul tuturor [limitărilor], în faţa cărora artistul se simte obosit, [singur]. „Vântul” este simbolul nefericirii, plânsul unui „[suflet ars]”, deznădăjduit, ilustrat de imaginea auditivă „[scârţâiau coroanele]”. Fiecare dintre termenii plasaţi în rima primului catren dezvăluie prezenţa [consoanelor] cu sonoritate tragică. Epitetul „[dormeau adânc]” exprimă încercarea de [negare] a unei realităţi invadate de această materie grea.
     Cea de-a [doua] strofă realizează [corespondența] dintre realitatea [exterioară] şi cea [interioară]. Metafora „Dormea întors amorul meu de plumb” reliefează singurătatea şi neliniştea. [Sinestezia] creată prin apelul la [vizual] „plumb”, la [auditiv] „să strig” şi la [tactil] „frig” accentuează apartenenţa poeziei la [simbolism]. Un rol important îl are imaginea [oximoronică] a „aripilor de plumb”, interpretată mitologic drept „[zbor întors]”, imposibilitatea evadării. Poetul, un [Icar] modern, nu se poate elibera din [labirintul] morţii. Utilizarea formelor pronominale „[meu]” şi verbale „[am început]”, „să strig”, „stam” de persoana I dezvăluie lirismul [subiectiv].
@@ -87,8 +87,24 @@
         if(!t) return "";
         return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
                 .replace(/ț/g, "t").replace(/ș/g, "s")
-                .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"'„”«»]/g, "")
+                .replace(/[.,#!$%\^&\*;:{}=\-_`~()"'„”«»]/g, "") // Elimină punctuația, dar păstrăm / în interiorul logicii de split
                 .replace(/\s{2,}/g," ").toLowerCase().trim(); 
+    }
+
+    // VERIFICARE VARIANTĂ SLASH
+    function isAnswerCorrect(userVal, correctVal) {
+        let normUser = normalize(userVal);
+        if (normUser === "") return false;
+
+        // Dacă avem variante multiple (slash)
+        if (correctVal.includes('/')) {
+            let parts = correctVal.split('/');
+            let normParts = parts.map(p => normalize(p));
+            // Verificăm dacă user-ul a scris una din ele SAU ambele cu virgulă între ele
+            return normParts.includes(normUser) || normUser === normalize(correctVal.replace(/\//g, ', '));
+        }
+
+        return normUser === normalize(correctVal);
     }
 
     function init() {
@@ -107,9 +123,7 @@
         let correctCount = 0; let answersToSave = [];
         inputs.forEach((input, idx) => {
             answersToSave.push(input.value); 
-            let val = normalize(input.value);
-            let cor = normalize(correctAnswers[idx]);
-            if (val === cor && val !== "") {
+            if (isAnswerCorrect(input.value, correctAnswers[idx])) {
                 correctCount++; input.style.color = "#10b981"; input.style.borderBottomColor = "#10b981";
             } else { input.style.color = "#4f46e5"; input.style.borderBottomColor = "#cbd5e1"; }
         });
@@ -134,10 +148,5 @@
     function finalCheck() {
         const inputs = document.querySelectorAll('.blank-input');
         let total = 0;
-        inputs.forEach((input, idx) => { if (normalize(input.value) === normalize(correctAnswers[idx])) total++; });
-        database.ref('clasa/' + studentName).update({ status: "Finalizat", progres: Math.round((total/correctAnswers.length)*100), scor: total + "/" + correctAnswers.length });
-        alert("Rezultat salvat!");
-    }
-</script>
-</body>
-</html>
+        inputs.forEach((input, idx) => { if (isAnswerCorrect(input.value, correctAnswers[idx])) total++; });
+        database.ref('clasa/' + studentName).update({ status
