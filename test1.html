@@ -1,323 +1,178 @@
 <!DOCTYPE html>
-
 <html lang="ro">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
     <title>Atelier de Literatura - Harap-Alb</title>
-
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-
     <style>
-
         :root { --bg-color: #f8fafc; --card-bg: #ffffff; --primary: #4f46e5; --success: #10b981; --accent: #f1f5f9; }
-
         * { box-sizing: border-box; transition: all 0.2s ease; }
-
         html, body { overscroll-behavior: none; user-select: none; -webkit-user-select: none; background-color: var(--bg-color); font-family: 'Inter', sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
-
         .app-container { width: 100%; max-width: 900px; background: var(--card-bg); padding: 40px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); }
-
         header { text-align: center; margin-bottom: 40px; border-bottom: 1px solid var(--accent); padding-bottom: 20px; }
-
         h1 { font-size: 1.8rem; color: var(--primary); margin: 0; }
-
         .progress-container { margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
-
         .progress-bar-bg { flex-grow: 1; height: 12px; background: var(--accent); border-radius: 10px; overflow: hidden; }
-
         #progress-fill { height: 100%; width: 0%; background-color: #ef4444; border-radius: 10px; transition: width 0.5s ease; }
-
         .content-area { font-family: 'Merriweather', serif; line-height: 2.2; font-size: 1.1rem; color: #334155; text-align: justify; }
-
         .blank-input { font-family: 'Inter', sans-serif; border: none; border-bottom: 2px solid #cbd5e1; background-color: #f8fafc; padding: 2px 6px; font-size: 1rem; font-weight: 600; color: var(--primary); width: 180px; outline: none; text-align: center; border-radius: 4px; }
-
         .input-number { font-size: 0.7rem; font-weight: 700; color: #94a3b8; margin-right: 2px; vertical-align: super; }
-
         .actions { margin-top: 50px; display: flex; justify-content: center; gap: 15px; }
-
         .btn { padding: 14px 28px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; border: none; }
-
         .btn-primary { background-color: var(--primary); color: white; }
-
         .btn-secondary { background-color: var(--accent); color: #64748b; }
-
         b { color: var(--primary); display: block; margin-top: 25px; font-size: 1.4rem; border-bottom: 2px solid var(--accent); }
-
     </style>
-
 </head>
-
 <body onload="init()">
-
 <div class="app-container">
-
     <header>
-
         <h1>Evaluare: Povestea lui Harap-Alb</h1>
-
-        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: ...</span>
-
+        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: Se încarcă...</span>
     </header>
-
     <div class="progress-container">
-
         <div class="progress-bar-bg"><div id="progress-fill"></div></div>
-
         <span id="progress-text" style="font-size:0.9rem; font-weight:600;">0%</span>
-
     </div>
-
     <div id="content" class="content-area"></div>
-
     <div class="actions">
-
         <button class="btn btn-primary" onclick="finalCheck()">Finalizează</button>
-
         <button class="btn btn-secondary" onclick="resetTest()">Resetează</button>
-
     </div>
-
 </div>
 
-
-
 <script>
-
     let studentName = localStorage.getItem('elev_nume');
-
     if (!studentName) { window.location.href = 'index.html'; }
 
-
-
     const firebaseConfig = {
-
       apiKey: "AIzaSyC2xOfKBy7FdA6uIyM0ij5ryHTop0yL3pg",
-
       authDomain: "bacromana-6f3eb.firebaseapp.com",
-
       databaseURL: "https://bacromana-6f3eb-default-rtdb.europe-west1.firebasedatabase.app",
-
       projectId: "bacromana-6f3eb",
-
       storageBucket: "bacromana-6f3eb.firebasestorage.app",
-
       messagingSenderId: "1087294677634",
-
       appId: "1:1087294677634:web:d92bf75a8b58f7b351ca9b"
-
     };
 
-
-
     firebase.initializeApp(firebaseConfig);
-
     const database = firebase.database();
-
     document.getElementById('student-name-display').innerText = "Elev: " + studentName;
 
+    // 1. MONITORIZARE STARE TEST (Dacă profesorul oprește sau schimbă testul)
+    database.ref('setari').on('value', snap => {
+        const d = snap.val();
+        if (!d || d.test_activ === false || d.test_id !== "test1.html") {
+            window.location.href = 'index.html';
+        }
+    });
 
+    // 2. CREĂM ELEVUL ÎN DB ȘI ABIA APOI ACTIVĂM SENZORUL
+    database.ref('clasa/' + studentName).update({
+        nume: studentName, status: "În lucru", test_id: "test1.html", test_nume: "Harap-Alb"
+    }).then(() => {
+        database.ref('clasa/' + studentName).on('value', snap => {
+            if (!snap.exists()) { window.location.href = 'index.html'; }
+        });
+    });
 
     const rawText = `<b>Introducere</b>
-
     Destinul şi [modernizarea] literaturii române au fost marcate în [perioada Marilor Clasici] de personalitatea lui [Titu Maiorescu]. Denumirea are atât semnificația de [„adepți ai clasicismului”], dar şi de [„modele”], căci adoptând acest program estetic, reprezentanții epocii devin [repere].
 
-
-
     <b>Reper 1</b>
-
     Textul aparţine [clasei de opere] care utilizează [narațiunea]. Construit pe [schema opoziţionalã Bine-Rãu] „Povestea lui Harap-Alb”, [publicat în 1877] în [Convorbiri literare], are un subiect simplu, linear, organizat pe baza unui [tipar arhicunoscut]. Numeroasele motive sugerează magicul și perfecțiunea: [cifra trei, superioritatea mezinului, cãlãtoria primejdioasã, probele, lupta finalã, recompensa, nunta]. 
-
     [Coordonata realist-psihologică] reorganizează acest tipar şi prezintă [maturizarea protagonistului], accentuând [dimensiunea sufletească] a celui care luptă pentru apărarea unor valori morale ca [adevărul, dreptatea, frumosul, iubirea]. [Originalitatea textului] este observabilă și la [nivelul limbajului] dominat [de oralitate, de fraze rimate, de umor]. Pornind de la opinia critică a lui [Alexandru Piru].
 
-
-
     <b>Reper 2</b>
-
     Dominanta tematică se configurează pe două dimensiuni: cea [populară] şi cea cultă, [formarea personalității celui care polarizează interesul epic]. 
-
     O secvenţă narativă relevantă pentru această tema complexă o constituie [coborârea în fântânã, ad inferos], reprezentând [începutul maturizãrii eroului]. Scena echivalează cu [un botez], căci prin apă fiul craiului primeşte [un alt nume şi o nouă identitate]. Pentru erou, acesta este [punctul cel mai de jos în care l-a dus lipsa de experinţă]. [M Eliade] considera coborârea în Infern [echivalentă cu decapitarea protagonistului, moartea iniţiatică]. Această secvență reflectă primul stadiu al existenței mezinului: [cel de novice/ începător]. El devine [rob], pentru că nu [distinge clar valoarea de nonvaloare], pentru că trebuie să parcurgă [chinul suferinței „negre” până va deveni un stăpânitor matur și responsabil].
-
     Se remarcă și un al doilea episod semnificativ care conturează personalitatea tânărului și pune în lumina cealaltă componentă a tematicii, [Răul învins de Bine]. Ca într-o [piesă de teatru], fata dezvăluie adevărata identitate a Spânului, acesta retează capul lui Harap-Alb, acuzându-l de încălcarea jurământului. Calul îl ucide pe Spân, aruncându-l din înaltul cerului, în vreme ce fata de împărat îl readuce la viață pe fiul craiului cu ajutorul obiectelor magice, [smicelele de măr dulce, apa vie şi apa moartă].
 
-
-
     <b>Reper 3</b>
-
     Un element de structură esențial este [titlul nominal de tip analitic ce promite lectorului o „poveste” deosebită a maturizării] tânărului crai, un destin unicizat la nivel gramatical prin [substantivul articulat „povestea”]. 
-
     Construcția [oximoronică] „Harap-Alb“ indică [statutul] de slugă naivă, [puritatea celui aflat la început de drum]. În aceeaşi măsură este o sugestie a coexistenţei [Binelui și a Răului].
 
-
-
     <b>Reper 4</b>
-
     Formula inițială și cea finală, aflate într-un raport de [complementaritate], [înrămează lumea] pe care o comunică povestitorul, pregătind ascultătorul [să intre în atmosfera de basm]. [Incipitul] conturează [cronotopul] specific poveştii ce debutează [ex abrupto] cu sintagma [„Amu cicã era odatã într-o țară”]. Indicele spațial [„într-o țară”] se combină cu cel temporal [„odată”] plasând evenimentele [într-un trecut nedeterminat, illo tempore]. Regionalismele [„amu”, „cică”] localizează întâmplările fantastice în lumea [humuleșteană a scriitorului]. 
-
     Basmul are o [dublă ieșire]: primul tip [de final, deznodământul], prin care eroul își redobândeşte condiția de împărat și este răsplătit cu o nuntă eternă. Al doilea final, [evocat prin ultima frază] asociază forme verbale şi pronominale [de persoana I plural şi a III-a singular].
 
-
-
     <b>Reper 5</b>
-
     Naraţiunea la persoana a III-a este desfăşurată [cronologic, prin înlănțuirea secvențelor] epice, fiind dramatizată prin dialogul [ce dinamizează întâmplările, susține evoluția acțiunii și caracterizează personajele]. Instanța epică este [omniscientă, omniprezentă, demiurgică], dar deseori îşi părăsește această [mască a obiectivității] și devine un [povestitor] înconjurat de un [auditoriu]. Naratorul nu rămâne indiferent, se miră, se bucură, este insinuant, se face auzit şi simțit mai ales prin [pactul narativ cu cititorul, pus în valoare de formulele mediane de tip captatio benevolentiae].
 
-
-
     <b>Personajele</b>
-
     Personajele, instanțe fundamentale în textul epic, [„ființe de hârtie”], aşa cum le defineşte [teoria literară], se grupează în pozitive şi negative, principale şi secundare, [„plate” și “rotunde”], construcția lor realizându-se prin asocierea a două dimensiuni: [una exterioară, alta interioară]. 
-
     Basmul lui Creangă stabileşte numeroase puncte de contact cu realitatea, de aceea [protagonistul, Harap-Alb, nu are multiple însușiri supranaturale]. Paginile basmului îi surprind [triplul statut social], de fiu de crai, de slugă „albă" şi naivă şi în final de împărat. Portretul fizic este schițat din câteva linii, [prin caracterizare directă]. 
-
     El este surprins în latura/coordonata sa psihologică, iar frământările lui [determină naşterea unor noi centre de conflict]. Alcătuit din [lumini] și [umbre], Harap-Alb acţionează în [situaţii excepţionale]. [Naivitatea] și deplina încredere în oameni, în ciuda interdicției părintelui său experimentat, se observă în scena a doua. 
-
     În ceea ce priveşte [numele], eroul îl primeşte acum, în clipa coborârii în fântână, cea în care începe să trăiască provocările adevăratei vieți. [Nu va mai fi Harap-Alb atunci când traseul inițiatic se încheie]. Astfel, chiar titlul sugerează [caracterul de bildungsroman al operei]. 
 
-
-
     Mezinul craiului se defineşte şi indirect prin comportament. Textul ilustrează [sensibilitatea] sa atunci când copilul fiind jignit [„iese afarã în grãdinã şi începe a plânge în inima sa”]. Tot acum el se dovedeşte [milos şi plin de compasiune față de Sfânta Duminică], căreia îi dăruieşte un bănuț şi de la care [va primi ajutor divin de trei ori]. 
-
     Din punctul de vedere [moral], el este [altruist şi partener devotat calului înaripat], dobândind toate calitățile necesare. Ajutat de fata de care se îndrăgostește, el îşi învinge rivalul și înviază. [De acum, inițiatul cunoaște binele și răul], se va pune necondiționat în [slujba „albului”]. 
 
-
-
     Asociat cu [Don Quijote] sau cu [Hamlet], considerat [„erou fermecător”] sau, [„simplu”], lipsit de „merite personale", protagonistul s-a schimbat mult [de când a plecat de acasă]. Caracterul [i s-a modelat], a înţeles ce [e mila]. Spre deosebire de basmul popular, eroul se metamorfozează [„pe scenă”]. 
-
-    Relația eroului cu antagonistul basmului, cu [Spânul] îi dezvăluie noblețea firii. Critica modernă afirmă că spânul reprezintă „[răul necesar]”: neiertător, îl supune pe crăițor în permanență unor probe periculoase. În fața calului, tânărul se dovedeşte când [neputincios, pesimist], când [nerăbdător și superficial]. Nici în scena trecerii podului tânărul nu dovedeşte [prea mult curaj], fiindcă tot [calul îl salvează].
-
-
-
-    <b>Concluzie</b>
-
-    În concluzie, basmul acesta definit de George Călinescu drept „o oglindire a vieții în mod fabulos" este un exemplu de creație cultă ce ilustrează viziunea despre lume a autorului.`;
-
-
+    Relația eroului cu antagonistul basmului, cu [Spânul] îi dezvăluie noblețea firii. Critica modernă afirmă că spânul reprezintă „[răul necesar]”: neiertător, îl supune pe crăițor în permanență unor probe periculoase. În fața calului, tânărul se dovedeşte când [neputincios, pesimist], când [nerăbdător și superficial]. Nici în scena trecerii podului tânărul nu dovedeşte [prea mult curaj], fiindcă tot [calul îl salvează].`;
 
     let correctAnswers = [];
+    function normalize(t) { if(!t) return ""; return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ț/g, "t").replace(/ș/g, "s").replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"'„”«»]/g, "").replace(/\s{2,}/g," ").toLowerCase().trim(); }
 
-
-
-    function normalize(t) { 
-
-        if(!t) return "";
-
-        return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-
-            .replace(/ț/g, "t").replace(/ș/g, "s")
-
-            .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"'„”«»]/g, "") 
-
-            .replace(/\s{2,}/g," ") 
-
-            .toLowerCase().trim(); 
-
+    function isAnswerCorrect(userVal, correctVal) {
+        let normUser = normalize(userVal);
+        if (normUser === "") return false;
+        if (correctVal.includes('/')) {
+            let parts = correctVal.split('/');
+            return parts.some(p => normalize(p) === normUser) || normUser === normalize(correctVal.replace(/\//g, ', '));
+        }
+        return normUser === normalize(correctVal);
     }
-
-
 
     function init() {
-
         const container = document.getElementById('content');
-
         let i = 0;
-
         const formattedText = rawText.replace(/\[(.*?)\]/g, (match, word) => {
-
             correctAnswers.push(word.trim());
-
             return `<span class="input-number">${i + 1}</span><input type="text" class="blank-input" data-index="${i++}" oninput="updateProgress()">`;
-
         });
-
         container.innerHTML = formattedText.replace(/\n/g, '<br>');
-
         loadSavedProgress();
-
     }
-
-
 
     function updateProgress() {
-
         const inputs = document.querySelectorAll('.blank-input');
-
         let correctCount = 0; let answersToSave = [];
-
         inputs.forEach((input, idx) => {
-
             answersToSave.push(input.value); 
-
-            if (normalize(input.value) === normalize(correctAnswers[idx]) && input.value !== "") {
-
+            if (isAnswerCorrect(input.value, correctAnswers[idx])) {
                 correctCount++; input.style.color = "#10b981"; input.style.borderBottomColor = "#10b981";
-
             } else { input.style.color = "#4f46e5"; input.style.borderBottomColor = "#cbd5e1"; }
-
         });
-
         const percent = Math.round((correctCount / correctAnswers.length) * 100);
-
         document.getElementById('progress-fill').style.width = percent + "%";
-
         document.getElementById('progress-text').innerText = percent + "%";
-
-        database.ref('clasa/' + studentName).set({ nume: studentName, progres: percent, scor: correctCount + "/" + correctAnswers.length, status: "În lucru", raspunsuri: answersToSave, test_id: "test1.html", test_nume: "Harap-Alb" });
-
+        database.ref('clasa/' + studentName).update({ progres: percent, scor: correctCount + "/" + correctAnswers.length, raspunsuri: answersToSave });
         sessionStorage.setItem('elev_raspunsuri_t1', JSON.stringify(answersToSave));
-
     }
-
-
 
     function loadSavedProgress() {
-
         const saved = sessionStorage.getItem('elev_raspunsuri_t1');
-
         if (saved) {
-
             const answers = JSON.parse(saved);
-
             const inputs = document.querySelectorAll('.blank-input');
-
             inputs.forEach((input, idx) => { if (answers[idx]) input.value = answers[idx]; });
-
             updateProgress(); 
-
         }
-
     }
-
-
 
     function resetTest() { if (confirm("Resetezi?")) { sessionStorage.removeItem('elev_raspunsuri_t1'); location.reload(); } }
-
+    
     function finalCheck() {
-
         const inputs = document.querySelectorAll('.blank-input');
-
-        let totalCorrect = 0;
-
-        inputs.forEach((input, idx) => { if (normalize(input.value) === normalize(correctAnswers[idx])) totalCorrect++; });
-
-        database.ref('clasa/' + studentName).update({ status: "Finalizat", progres: Math.round((totalCorrect/correctAnswers.length)*100), scor: totalCorrect + "/" + correctAnswers.length });
-
+        let total = 0;
+        inputs.forEach((input, idx) => { if (isAnswerCorrect(input.value, correctAnswers[idx])) total++; });
+        database.ref('clasa/' + studentName).update({ status: "Finalizat", progres: Math.round((total/correctAnswers.length)*100), scor: total + "/" + correctAnswers.length });
         alert("Rezultat salvat!");
-
     }
-
 </script>
-
 </body>
-
 </html>
-
-Am eliminat eu un cuvant
