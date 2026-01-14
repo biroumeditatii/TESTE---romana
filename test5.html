@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Atelier de Literatura - Plumb</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-color: #f8fafc; --card-bg: #ffffff; --primary: #4f46e5; --success: #10b981; --accent: #f1f5f9; }
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+        html, body { overscroll-behavior: none; user-select: none; -webkit-user-select: none; background-color: var(--bg-color); font-family: 'Inter', sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 900px; background: var(--card-bg); padding: 40px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); }
+        header { text-align: center; margin-bottom: 40px; border-bottom: 1px solid var(--accent); padding-bottom: 20px; }
+        h1 { font-size: 1.8rem; color: var(--primary); margin: 0; }
+        .progress-container { margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
+        .progress-bar-bg { flex-grow: 1; height: 12px; background: var(--accent); border-radius: 10px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background-color: #ef4444; border-radius: 10px; transition: width 0.5s ease; }
+        .content-area { font-family: 'Merriweather', serif; line-height: 2.2; font-size: 1.1rem; color: #334155; text-align: justify; }
+        .blank-input { font-family: 'Inter', sans-serif; border: none; border-bottom: 2px solid #cbd5e1; background-color: #f8fafc; padding: 2px 6px; font-size: 1rem; font-weight: 600; color: var(--primary); width: 180px; outline: none; text-align: center; border-radius: 4px; }
+        .input-number { font-size: 0.7rem; font-weight: 700; color: #94a3b8; margin-right: 2px; vertical-align: super; }
+        .actions { margin-top: 50px; display: flex; justify-content: center; gap: 15px; }
+        .btn { padding: 14px 28px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; border: none; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-secondary { background-color: var(--accent); color: #64748b; }
+        b { color: var(--primary); display: block; margin-top: 25px; font-size: 1.4rem; border-bottom: 2px solid var(--accent); }
+    </style>
+</head>
+<body onload="init()">
+<div class="app-container">
+    <header>
+        <h1>Evaluare: Plumb</h1>
+        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: ...</span>
+    </header>
+    <div class="progress-container">
+        <div class="progress-bar-bg"><div id="progress-fill"></div></div>
+        <span id="progress-text" style="font-size:0.9rem; font-weight:600;">0%</span>
+    </div>
+    <div id="content" class="content-area"></div>
+    <div class="actions">
+        <button class="btn btn-primary" onclick="finalCheck()">Finalizează</button>
+        <button class="btn btn-secondary" onclick="resetTest()">Resetează</button>
+    </div>
+</div>
+
+<script>
+    let studentName = localStorage.getItem('elev_nume');
+    if (!studentName) { window.location.href = 'index.html'; }
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2xOfKBy7FdA6uIyM0ij5ryHTop0yL3pg",
+      authDomain: "bacromana-6f3eb.firebaseapp.com",
+      databaseURL: "https://bacromana-6f3eb-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "bacromana-6f3eb",
+      storageBucket: "bacromana-6f3eb.firebasestorage.app",
+      messagingSenderId: "1087294677634",
+      appId: "1:1087294677634:web:d92bf75a8b58f7b351ca9b"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    document.getElementById('student-name-display').innerText = "Elev: " + studentName;
+
+    const rawText = `<b>Reper 1</b>
+    George Bacovia a marcat poezia românească prin [profunzimea] şi [sensibilitatea] operelor sale, proiectându-şi trăirile la dimensiuni [infernale] şi demonstrând, ca şi [Emil Cioran] mai târziu, că se poate trăi, constant, „[pe culmile disperării]”. Considerat poet [simbolist] sau definit de G. Călinescu „[neosimbolist]”, acesta îşi depăşeşte epoca, anticipând modernismul [interbelic] prin cele două volume de poezii, „[Plumb]” şi „[Schintei galbene]”.
+    Simbolismul este un curent literar [european], apărut ca reacţie la adresa excesului [sentimental] al [romantismului]. În limba greacă „[symbolon]” este echivalentul „[semnului]”, deci lirica simbolistă este una a descifrării [semnelor]. Se remarcă preferinţa pentru [corespondențe] şi [sinestezii], asocieri spontane de senzaţii [vizuale, olfactive, auditive și tactile]. Poezia simbolistă devine o [artă a sugestiei], preferându-se textele scrise în vers [liber], eliberate de regulile/rigorile versificaţiei [clasice]. Simbolismul [autentic] în literatura română se instaurează prin activitatea literară a lui [George Bacovia], dar fusese teoretizat de [Alexandru Macedonski] în articolele sale [Poezia Viitorului] şi [Despre logica poeziei].
+
+    <b>Reper 2</b>
+    Creaţia literară „Plumb” este o [artă poetică] simbolistă, exprimând viziunea despre lume a autorului, într-un [limbaj] literar care-l particularizează. Ea deschide [volumul de debut], cu acelaşi nume, apărut în [1916], o perioadă tulbure, deoarece România se pregătea să intre în [Primul Război Mondial]. Poziţia ei privilegiată îi demonstrează statutul de [text-program], cheie de [interpretare] a unui univers liric monoton. Ea se înscrie în universul liric specific bacovian, al „[atmosferei de plumb], în care pluteşte [obsesia morţii şi o descompunere a fiinţei organice]” (Eugen Lovinescu).
+    Dominanta tematică se configurează pe două dimensiuni: [condiţia] de (con)damnat a poetului într-o societate superficială, supusă [morții] şi [descompunerii] şi solitudinea lui în această lume [pustie și rece ca un cavou].
+    Prima secvenţă lirică pune în evidenţă cea dintâi coordonată a tematicii și creionează planul [exterior] sufocant. „Plumbul”, „somnul”, „vântul” sunt simboluri ale degradării. În lirica românească, a vieţui într-un [cavou] rămâne o reprezentare legată de numele lui George Bacovia. Spaţiul [strâmt], mortuar este echivalentul tuturor [limitărilor], în faţa cărora artistul se simte obosit, [singur]. „Vântul” este simbolul nefericirii, plânsul unui „[suflet ars]”, deznădăjduit, ilustrat de imaginea auditivă „[scârţâiau coroanele]”. Fiecare dintre termenii plasaţi în rima primului catren dezvăluie prezenţa [consoanelor] cu sonoritate tragică. Epitetul „[dormeau adânc]” exprimă încercarea de [negare] a unei realităţi invadate de această materie grea.
+    Cea de-a [doua] strofă realizează [corespondența] dintre realitatea [exterioară] şi cea [interioară]. Metafora „Dormea întors amorul meu de plumb” reliefează singurătatea şi neliniştea. [Sinestezia] creată prin apelul la [vizual] „plumb”, la [auditiv] „să strig” şi la [tactil] „frig” accentuează apartenenţa poeziei la [simbolism]. Un rol important îl are imaginea [oximoronică] a „aripilor de plumb”, interpretată mitologic drept „[zbor întors]”, imposibilitatea evadării. Poetul, un [Icar] modern, nu se poate elibera din [labirintul] morţii. Utilizarea formelor pronominale „[meu]” şi verbale „[am început]”, „să strig”, „stam” de persoana I dezvăluie lirismul [subiectiv].
+
+    <b>Reper 3</b>
+    Textul poetic este dispus sub forma unui [monolog] tragic, exprimat prin intermediul a [două] catrene perfecte, bazate pe un [paralelism] sintactic, pe [versuri-refren] și pe [repetiţii]. Se creează astfel o [circularitate] dramatică a discursului liric. [Simetria] este accentuată şi de structurile impersonale „era frig”, „era vânt”, subliniind sentimentul de [spleen]. În viziunea lui [Tudor Vianu], echilibrul compoziţional este caracteristic [primei] etape din creaţia bacoviană.
+    Strofele debutează cu un verb la [imperfect], urmat de un circumstanţial de mod şi de sintagme având în componenţă termenul „[plumb]”. Timpul imperfect oferă discursului liric aspectul fluid al unei viziuni de coşmar. La nivel [fonetic] se conturează atmosfera apăsătoare prin frecvenţa consoanelor ce creează [sonoritatea] rigidă, în timp ce terminaţiile [vocalice] ale imperfectului sugerează [plânsul].
+
+    <b>Reper 4</b>
+    Titlul, structură [sintetică], propune un singur substantiv comun [nearticulat] cu rolul stilistic de a generaliza atmosfera apăsătoare. El devine o [cheie de lectură] și conturează un [orizont de așteptare]: lumea stă sub semnul [apăsării] prin faptul că „plumbul” este unul dintre cele mai grele metale.
+    [Sinestezia] conturată în titlu este evidentă. La nivel [tactil], greutatea metalului sugerează [apăsarea] sufletească, iar maleabilitatea metalului accentuează [dezorientarea] psihică. Din punct de vedere [auditiv], sonoritatea surdă a cuvântului format din patru [consoane] şi o singură [vocală] mediana demonstrează [închiderea] definitivă a spaţiului existenţial. [Vizual], el evocă stări [melancolice] şi [maladive], fapt accentuat de culoarea [gri] a plumbului [solid] şi de cea [galbenă], rezultată în urma topirii lui. Poetul însuşi mărturisea: „Plumbul ars e galben. [Sufletul] ars e galben”.
+    La nivel [formal], „plumbul” devine laitmotiv, regăsit de [șase] ori în [opt] versuri. Se subliniază faptul că lumea este un spaţiu [închis] în care se prăbuşesc toate. Poetul este o făptură [captivă] mediului sau propriei voinţe şi contemplă acest spectacol macabru: [tot ce e viu] se mineralizează.`;
+
+    let correctAnswers = [];
+
+    function normalize(t) { 
+        if(!t) return "";
+        return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/ț/g, "t").replace(/ș/g, "s")
+                .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"'„”«»]/g, "")
+                .replace(/\s{2,}/g," ").toLowerCase().trim(); 
+    }
+
+    function init() {
+        const container = document.getElementById('content');
+        let i = 0;
+        const formattedText = rawText.replace(/\[(.*?)\]/g, (match, word) => {
+            correctAnswers.push(word.trim());
+            return `<span class="input-number">${i + 1}</span><input type="text" class="blank-input" data-index="${i++}" oninput="updateProgress()">`;
+        });
+        container.innerHTML = formattedText.replace(/\n/g, '<br>');
+        loadSavedProgress();
+    }
+
+    function updateProgress() {
+        const inputs = document.querySelectorAll('.blank-input');
+        let correctCount = 0; let answersToSave = [];
+        inputs.forEach((input, idx) => {
+            answersToSave.push(input.value); 
+            let val = normalize(input.value);
+            let cor = normalize(correctAnswers[idx]);
+            if (val === cor && val !== "") {
+                correctCount++; input.style.color = "#10b981"; input.style.borderBottomColor = "#10b981";
+            } else { input.style.color = "#4f46e5"; input.style.borderBottomColor = "#cbd5e1"; }
+        });
+        const percent = Math.round((correctCount / correctAnswers.length) * 100);
+        document.getElementById('progress-fill').style.width = percent + "%";
+        document.getElementById('progress-text').innerText = percent + "%";
+        database.ref('clasa/' + studentName).set({ nume: studentName, progres: percent, scor: correctCount + "/" + correctAnswers.length, status: "În lucru", raspunsuri: answersToSave, test_id: "test5.html", test_nume: "Bacovia - Plumb" });
+        sessionStorage.setItem('elev_raspunsuri_t5', JSON.stringify(answersToSave));
+    }
+
+    function loadSavedProgress() {
+        const saved = sessionStorage.getItem('elev_raspunsuri_t5');
+        if (saved) {
+            const answers = JSON.parse(saved);
+            const inputs = document.querySelectorAll('.blank-input');
+            inputs.forEach((input, idx) => { if (answers[idx]) input.value = answers[idx]; });
+            updateProgress(); 
+        }
+    }
+
+    function resetTest() { if (confirm("Resetezi?")) { sessionStorage.removeItem('elev_raspunsuri_t5'); location.reload(); } }
+    function finalCheck() {
+        const inputs = document.querySelectorAll('.blank-input');
+        let total = 0;
+        inputs.forEach((input, idx) => { if (normalize(input.value) === normalize(correctAnswers[idx])) total++; });
+        database.ref('clasa/' + studentName).update({ status: "Finalizat", progres: Math.round((total/correctAnswers.length)*100), scor: total + "/" + correctAnswers.length });
+        alert("Rezultat salvat!");
+    }
+</script>
+</body>
+</html>
