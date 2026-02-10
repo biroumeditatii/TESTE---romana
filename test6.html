@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Atelier de Literatura - Corola de minuni a lumii</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root { --bg-color: #f8fafc; --card-bg: #ffffff; --primary: #4f46e5; --success: #10b981; --accent: #f1f5f9; }
@@ -31,7 +34,7 @@
 <div class="app-container">
     <header>
         <h1>Evaluare: Corola de minuni a lumii</h1>
-        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: Se încarcă...</span>
+        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: Se securizează...</span>
     </header>
     <div class="progress-container">
         <div class="progress-bar-bg"><div id="progress-fill"></div></div>
@@ -60,23 +63,30 @@
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    document.getElementById('student-name-display').innerText = "Elev: " + studentName;
 
-    // 1. MONITORIZARE STARE TEST (Redirecționare live)
-    database.ref('setari').on('value', snap => {
-        const d = snap.val();
-        if (!d || d.test_activ === false || d.test_id !== "test6.html") {
-            window.location.href = 'index.html';
-        }
-    });
-
-    // 2. ÎNREGISTRARE ȘI MONITORIZARE ȘTERGERE
-    database.ref('clasa/' + studentName).update({
-        nume: studentName, status: "În lucru", test_id: "test6.html", test_nume: "Corola de minuni a lumii"
-    }).then(() => {
-        database.ref('clasa/' + studentName).on('value', snap => {
-            if (!snap.exists()) { window.location.href = 'index.html'; }
+    // 1. AUTENTIFICARE ANONIMĂ (Necesară pentru reguli private)
+    firebase.auth().signInAnonymously().then(() => {
+        document.getElementById('student-name-display').innerText = "Elev: " + studentName;
+        
+        // 2. MONITORIZARE LIVE (Redirecționare dacă profesorul oprește testul)
+        database.ref('setari').on('value', snap => {
+            const d = snap.val();
+            if (!d || d.test_activ === false || d.test_id !== "test6.html") {
+                window.location.href = 'index.html';
+            }
         });
+
+        // 3. ÎNREGISTRARE ȘI MONITORIZARE ȘTERGERE
+        database.ref('clasa/' + studentName).update({
+            nume: studentName, status: "În lucru", test_id: "test6.html", test_nume: "Corola de minuni a lumii"
+        }).then(() => {
+            database.ref('clasa/' + studentName).on('value', snap => {
+                if (!snap.exists()) { window.location.href = 'index.html'; }
+            });
+        });
+    }).catch(err => {
+        alert("Eroare de conexiune securizată!");
+        window.location.href = 'index.html';
     });
 
     const rawText = `<b>Reper</b> 
@@ -86,7 +96,7 @@
     Astfel, prin [simulare] și [stimulare], prin [adoptarea] și [adaptarea] modelelor se remarcă o [dezvoltare] a literaturii care în scurt timp atinge nivelul valoric [occidental].
     Definit prin ruptura de [tradiție], modernismul blagian reprezintă [noul], schimbarea, originalitatea, iar componenta tematică este preferința pentru [cunoaștere].
     Revoluționând [structura] poetică, Lucian Blaga caută in textele sale lirice soluții de ieșire din tiparele [prozodice] tradiționale și propune un [nou] model, bazat pe versuri [inegale] ca măsură, cu rimă [albă].
-    Poezia se caracterizează prin [discurs] liber, prin tehnica [ingambamentului], prin [dislocări] sintactice, prin metaforizare [excesivă], prin construcții [oximoronicice], ce creează ambiguitatea limbajului.
+    Poezia se caracterizează prin [discurs] liber, prin tehnica [ingambamentului], prin [dislocări] sintactice, prin metaforizare [excesivă], prin construcții [oximoronice], ce creează ambiguitatea limbajului.
 
     <b>Reper</b> 
     Lucian Blaga este unul dintre creatorii români [interbelici] care a reusit sa dea un sens înalt iubirii și gândirii [filozofice] prin volumele de poezii, prin trilogii și prin opera dramatică „[Meşterul Manole]”. Volumul „[Poemele luminii]”, aparut in [1919], este deschis de poezia „Eu nu strivesc corola de minuni a lumii”, si defineste perfect concepția originală a lui Blaga despre destin și cunoastere, într-un lung limbaj literar care-l particularizează.
@@ -99,20 +109,20 @@
     La nivel compozițional, discursul poetic de tip [argumentative] se concentrează într-o [singură] strofă polimorfă, de [douăzeci] de versuri, cu măsură [inconstanta].
     Cele [patru] secvențe au centrul de iradiere a semnificației în metafora [luminii], simbol al cunoașterii.
     Prima secvență, însumând [cinci] versuri, pune în evidență cea dintai componentă tematică, acentuând relația eu-univers enunțată metaforic în titlu.
-    Se figurează o călătorie inițiatică, pentru că în „[calea]” sa, poetul are revelația miracolului [vieții] și a misterului [morții] pe care nu încearcă să le destrame: „Eu nu strivesc corola de minuni a lumii / și nu ucid / cu mintea tainele ce le-ntâlnesc / în calea mea”.
+    Se figurează o călătorie inițiatică, pentru că în „[calea]” sa, poetul are revelația miracolului [vieții] și a misterului [morții] pe care nu încearcă să le destrame.
     Fragmentele- [petale] ale acestui univers sunt legate prin misterioase [corespondențe], sugerate la nivel textual prin coordonarea termenilor [enumerației] „în flori, în ochi, pe buze ori morminte”.
     „[Florile]” sugerează mirabila frumusețe a naturii, a universului nu doar vegetal, fiindcă definesc și [nașterea], copilăria, dar și taina [înfloririi], a rodirii.
     Motivul „[ochilor]” simbolizând pământul însuși care își deschide privirea pretutindeni se asociază firesc ideii de [cunoaștere] a lumii înconjurătoare, dar și conceptului de „oglindă a sufletului”, a universului interior.
     „[Buzele]” înseamnă rostire, cuvânt poetic, iubire, [sărut]. „[Mormintele]” pot fi simboluri ale mineralului, țărâna, dar [tradiția], păstrarea legăturii spirituale cu strămoșii.
     Deci, [patru] termeni devin metafore ale [Nașterii], ale [Cunoașterii], ale [Logosului], ale [Erosului] dar și ale [Thanatosului].
-    Ordinea lor nu este întâmplătoare, fiind asociate într-o gradație ascendentă și urmărind procesul [vieții] și al [morții], încheierea unui [ciclu] existenţial şi revenirea la terestru.
+    Ordinea lor nu este întâmplătoare, fiind preconizate într-o gradație ascendentă și urmărind procesul [vieții] și al [morții], încheierea unui [ciclu] existenţial şi revenirea la terestru.
     Ca taine întâlnite în cale și ocrotite prin iubire, cele patru fragmente ale unui Tot armonic îmbogățesc „vraja nepătrunsului ascuns”.
     Secvența a [doua], alcătuită din [trei] versuri detaliază cealaltă componentă a [temei], un alt mod de cunoaștere: cea rațională, numită de Blaga „[cunoaștere paradisiacă]”, figurată poetic prin metafora „lumina [altora]” în care pronumele nehotărât „[altora]” desemnează mulțimea celor care aleg calea [minus-cunoașterii].
-    Dacă prima secvență evidenția prezența verbelor la forma [negative] „nu strivesc”, „nu ucid cu mintea”, prin dubla negație primind o semnificație [pozitivă] „nu strivesc”=ocrotesc, „nu ucid cu mintea”=protejez, amplific, a doua secvență exprimă contrariul printr-un verb la forma [afirmativă]: „Lumina altora / sugrumă vraja nepătrunsului ascuns”, „sugrumă”=ucide taina.
+    Dacă prima secvență evidenția prezența verbelor la forma [negative] „nu strivesc”, „nu ucid cu mintea”, prin dubla negație primind o semnificație [pozitivă] „nu strivesc”=ocrotesc, „nu ucid cu mintea”=protejez, amplific, a doua secvență exprimă contrariul printr-un verb la forma [afirmativă].
 
     <b>Reper</b> 
     La nivelul relațiilor de opoziție, textul dezvoltă o [antiteză] între „lumina altora” și „lumina mea”, în care alternanța „[mea]”, ca unicitate a eului liric se opune „[altora]”, echivalent al mediocritatii celor din jur.
-    Se supramarchează/ marcheaza o data in plus la nivelul persoanei gramaticale a pronumelor de persoana [I] / a [III]-a contrastul fundamental al poeziei.
+    Se supramarchează la nivelul persoanei gramaticale a pronumelor de persoana [I] / a [III]-a contrastul fundamental al poeziei.
     Se remarca [simetria] dintre secvența [întâi] și [ultima], cu valoare de [concluzie], subliniată prin conjunctia „[căci]”, echivalenta cu „[deci]”.
     Iubirea devine, astfel, instrument de cunoaștere, calea descifrării tainelor lumii.
     Prin recurenta enumerației „si [flori, si ochi, si buze sau morminte]”, „corola de minuni a lumii” pare a se închide [sferic], refăcându-și [perfecțiunea].
