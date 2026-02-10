@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Atelier de Literatura - Luceafărul</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root { --bg-color: #f8fafc; --card-bg: #ffffff; --primary: #4f46e5; --success: #10b981; --accent: #f1f5f9; }
@@ -31,7 +34,7 @@
 <div class="app-container">
     <header>
         <h1>Evaluare: Luceafărul</h1>
-        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: Se încarcă...</span>
+        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: Se securizează...</span>
     </header>
     <div class="progress-container">
         <div class="progress-bar-bg"><div id="progress-fill"></div></div>
@@ -60,112 +63,7 @@
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    document.getElementById('student-name-display').innerText = "Elev: " + studentName;
 
-    // Textul a fost curățat de paranteze duble [[ ]] pentru a funcționa corect cu generatorul de input-uri
-    const rawText = `<b>Reper 1</b>
-    Destinul și [modernizarea] literaturii române au fost marcate în [perioada Marilor Clasici] de personalitatea lui [Titu Maiorescu], mentorul [„Junimii”]. Denumirea are atât semnificația de [„adepți ai clasicismului”], dar și de [„modele”], căci adoptând acest program estetic, reprezentanții epocii devin [repere]: pentru [proza realistă], [Ioan Slavici], pentru [basmul cult, Ion Creangă], pentru opera [dramatică, Ion Luca Caragiale] și pentru [lirica romantică, Mihai Eminescu].
-    
-    <b>Reper 2</b>
-    Apărut inițial în [„Almanahul România Jună”] din Viena in [1883], poemul este publicat ulterior în [„Convorbiri literare”] și apoi în volumul [„Poezii”] coordonat de [Titu Maiorescu]. Textul ilustrează fuzionarea [„la cele mai înalte temperaturi”] a trăsăturilor [romantismului românesc și European], a temelor și motivelor specifice acestui curent cultural.
-    O serie de elemente definitorii trimit cu gândul la estetica romantică. Motivul [„privirii”] - cei doi se îndrăgostesc printr-o comunicare aproape hipnotică. Motivul [„luminii”] plasează relația într-un plan superior. Simbolul [„oglinzii”], ca reflectare a celuilalt în propriul „eu” se îmbină cu [„visul”], instrumentul care-l leaga pe Luceafăr de pământul și iubirea muritorilor sau [punte unică a unei imposibile legături între două lumi închise].
-    Tablourile poetice ilustrează relația de [opoziție/antiteză] specific [romantică], a planurilor terestru-uman și ceresc-universal conturată astfel: tabloul I [strofele 1-43] și al IV-lea [strofele 86-98] evocă cele două lumi îmbinate, iar secvența a II -a [strofele 44-64] exclusiv pământească este contrapunctată de cea cosmică din partea a III-a [strofele 65-85].
-    Erosul, tematica preferată a romanticilor, se manifestă major între Cătălin și Cătălina, numele lor dezvãluind [perfecţiunea cuplului şi compatibilitatea], încercarea de unire a contrariilor, [COINCIDENTIA OPPOSITORUM]. Dilema fetei ce pendulează între geniul superior și omul de rând sugerează [dualitatea ființei umane: apolinicul și dionisiacul].
-    
-    <b>Reper 3</b>
-    În manuscrisul [2275] al poemului analizat de [Perpessicius], pe fila [56], Mihai Eminescu notează: [„soarta Luceafărului seamănă mult cu soarta geniului pe pământ”] și face referire la basmul publicat de [germanul Kunisch într-un memorial de călătorie prin Țările Române, „Fata în grădina de aur”]. Poetul îl utilizează ca pretext narativ, dar îi modifică [finalul], considerându-l [nedemn de poziția superioară a geniului care „nu are moarte, dar nici noroc”].
-    Această sursă [folclorică] se îmbină cu cea [mitologică], povestea [Zburătorului], simbol al visului de dragoste. Credinţele populare precizeazã faptul cã sentimentele tinerelor ajunse la adolescenţã se datoreazã unei fiinţe supranaturale, înger și demon deopotrivă, ce le [tulburã noaptea echilibrul fizic şi emoțional], „o [semidivinitate erotică], un daimon arhaic de tip malefic”. Se valorifică și alte mituri [creștine și precreștine, Fiul care se naște din Tatăl, puritatea și unicitatea Fecioarei], imnurile indiene [Rig-Veda], cele [grecești], în care Hyperion este [semizeu, fiul lui Uranus, tatăl lui Helios – Soarele], legătura Cerului cu Pământul.
-    Zoe Dumitrescu-Bușulenga adaugă alte două izvoare de inspirație: [detaliul biografic, viața lui Eminescu ridicată la rang de simbol] și [ideea filozofică] ce aparține anticilor Platon, Aristotel și Socrate de la care Mihai Eminescu preia conceptul [„cunoaște-te pe tine însuți”], dar și lui Schopenhauer și Kant. Ei susțineau că lumea este reflectarea voinței imense a omului de geniu, fundamentale fiind lucrările [„Lumea ca voință și reprezentare”] si [„Critica rațiunii pure”].
-    
-    <b>Reper 4</b>
-    Textul este greu de încadrat într-un singur gen literar, el aparține în aceeași măsură [epicului, liricului și dramaticului]. În acest sens se exprimã şi [Tudor Vianu], afirmând cã opera este „o [structurã epicã a unei poveşti de dragoste],… cu scene [dramatice] pentru a transmite…un [sens liric-filosofic înalt]: poziţia tristã şi însinguratã a geniului.” Tot el considera poemul [„o sinteză a categoriilor lirice” eminesciene], dar și „poem al [contrarilor] reunite sub semnul universalității”. Ca specie literară este un [poem liric obiectiv], cu un fir epic gradat cronologic pe baza tablourilor similare actelor unei [piese de teatru]. 
-    Criticul [Nicolae Manolescu] identifică în poem patru [„voci lirice”] ale Luceafărului, sau [patru „măști”] în viziunea lui [Tudor Vianu]. Hyperion este [geniul atras de lumea muritoare]; Cătălina este ființa care se înalță prin aspirația către eternitate și care, în registrul diurn, răspunde chemării lui [Cătălin], iar în cel nocturn răspunde chemării [Luceafărului]; Demiurgul îl reprezintă pe [poet] în ipostaza lui cea mai înaltă, iar Cătălin este [ilustrarea omului comun].
-    
-    <b>Reper 5</b>
-    Dominanta tematică se configurează pe patru dimensiuni: [iubirea, timpul bivalent -universal și individual-, cosmosul, natura]. Supratema rămâne cea a [condiției omului de geniu]. 
-    Tabloul întâi conturează decorul tipic romantic și accentuează una dintre componentele tematice definitorii: [erotica]. Întâlnirea lor se produce într-un spațiu [oniric], punând față în față dorință de absolut a fetei și de ieșire din absolut a Luceafărului. Cele două [invocații] au structură identică ilustrând [paralelismul sintactic] și devin un descântec, figurând un [ceremonial/ un ritual] de iubire. Licența poetică „cobori în jos” este un simbol pentru coborârea nemuritoarei în planul inferior, [ad inferos]. Răspunzând chemării ei, Luceafărul apare prima data în ipostaza [neptuniană], simbol al apei primordiale, mitul Indian din [Rig-Veda]. El întră în spațiul intim asemenea unui [Zburător]. Se remarcă motivul romantic al [„mortului frumos”] exprimat printr-un [oximoron]: „Un mort frumos, cu ochii vii”. A doua metamorfoză este cea [demonică]. Aceste întrupări succesive în [înger și demon] echivalează cu o adevărată cădere din lumea originară.
-    Timpul este sugerat în tabloul al lll-lea, strofele [65-85]. Planul este cosmic, prezentând atât [călătoria intergalactică] a Luceafărului, cât și [dialogul cu Demiurgul]. Răspunsul lui se deschide prin numirea eroului [Hyperion], amintindu-i natura lui [divină]. Demiurgul îi oferă înțelepciune, dar îi refuză [moartea], deoarece [desprinderea sa de cer ar duce la haos].
-    
-    <b>Reper 6</b>
-    Incipitul de tip [narativ] conține [formula specifică] prin care cititorul este invitat să intre în atmosfera de basm: „A fost odată ca-n povesti”. Întâmplările sunt puse sub [semnul unui timp nedeterminat], illo [tempore], unic și irepetabil. În aceste condiții, fata de împărat va avea atributele unei ființe ieșite din limitele comunului: [Și era una la părinți/ Și mândră-n toate cele/ Cum e Fecioara intre sfinți/ Și luna între stele]. 
-    În final sunt evocaţi toți patru. Chemarea Cătălinei este [simetrică], evidenţiind prezenţa [paralelismului sintactic]; astfel, primele douã invocații sunt [identice]: [Cobori în jos, luceafãr blând,/ Alunecând pe-o razã/ Pãtrunde-n casã şi în gând/ Şi viaţa-mi lumineazã], iar prin cea de-a treia [Cobori în jos, luceafãr blând,/ Alunecând pe-o razã/ Pãtrunde-n codru şi în gând/ Norocu-mi lumineazã], fata renunţã la Hyperion. [Casa] devine [codru], iar [viaţa] devine [noroc]. Se ilustrează poziția de superioritate a geniului, susţinând interpretarea teoretizatã de [Schopenhauer]: geniul nu are [moarte, dar nici noroc]. 
-    
-    <b>Reper 7</b>
-    Titlul, [structură sintetică], propune un singur substantiv comun [articulat hotărât] cu rolul de a [individualiza/uniciza] făptura lui duală. Cuvântul [luceafăr] provine din latinescul [luciferus], cel ce lucește, iar termenul [Hyperion] în limba greacă înseamnă [cel care merge pe deasupra]. Există și o semnificație [românească], legată de [„stea a ciobanului”], planeta [Venus], dar și una [iraniană] însemnând [„strălucirea pură”].`;
-
-    let correctAnswers = [];
-
-    // FUNCȚIA NORMALIZE (IGNORĂ PUNCTUAȚIA, GHILIMELELE ȘI DIACRITICELE)
-    function normalize(t) { 
-        if(!t) return "";
-        return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/ț/g, "t").replace(/ș/g, "s")
-                .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"'„”«»]/g, "")
-                .replace(/\s{2,}/g," ").toLowerCase().trim(); 
-    }
-
-    // LOGICA FLEXIBILĂ PENTRU SLASH /
-    function isAnswerCorrect(userVal, correctVal) {
-        let normUser = normalize(userVal);
-        if (normUser === "") return false;
-        if (correctVal.includes('/')) {
-            let parts = correctVal.split('/');
-            let normParts = parts.map(p => normalize(p));
-            return normParts.includes(normUser) || normUser === normalize(correctVal.replace(/\//g, ', '));
-        }
-        return normUser === normalize(correctVal);
-    }
-
-    function init() {
-        const container = document.getElementById('content');
-        let i = 0;
-        const formattedText = rawText.replace(/\[(.*?)\]/g, (match, word) => {
-            correctAnswers.push(word.trim());
-            return `<span class="input-number">${i + 1}</span><input type="text" class="blank-input" data-index="${i++}" oninput="updateProgress()">`;
-        });
-        container.innerHTML = formattedText.replace(/\n/g, '<br>');
-        loadSavedProgress();
-    }
-
-    function updateProgress() {
-        const inputs = document.querySelectorAll('.blank-input');
-        let correctCount = 0; let answersToSave = [];
-        inputs.forEach((input, idx) => {
-            answersToSave.push(input.value); 
-            if (isAnswerCorrect(input.value, correctAnswers[idx])) {
-                correctCount++; input.style.color = "#10b981"; input.style.borderBottomColor = "#10b981";
-            } else { input.style.color = "#4f46e5"; input.style.borderBottomColor = "#cbd5e1"; }
-        });
-        const percent = Math.round((correctCount / correctAnswers.length) * 100);
-        document.getElementById('progress-fill').style.width = percent + "%";
-        document.getElementById('progress-text').innerText = percent + "%";
-        database.ref('clasa/' + studentName).set({ nume: studentName, progres: percent, scor: correctCount + "/" + correctAnswers.length, status: "În lucru", raspunsuri: answersToSave, test_id: "test3.html", test_nume: "Luceafărul" });
-        sessionStorage.setItem('elev_raspunsuri_t3', JSON.stringify(answersToSave));
-    }
-
-    function loadSavedProgress() {
-        const saved = sessionStorage.getItem('elev_raspunsuri_t3');
-        if (saved) {
-            const answers = JSON.parse(saved);
-            const inputs = document.querySelectorAll('.blank-input');
-            inputs.forEach((input, idx) => { if (answers[idx]) input.value = answers[idx]; });
-            updateProgress(); 
-        }
-    }
-
-    function resetTest() { if (confirm("Resetezi?")) { sessionStorage.removeItem('elev_raspunsuri_t3'); location.reload(); } }
-    
-    function finalCheck() {
-        const inputs = document.querySelectorAll('.blank-input');
-        let total = 0;
-        inputs.forEach((input, idx) => { if (isAnswerCorrect(input.value, correctAnswers[idx])) total++; });
-        database.ref('clasa/' + studentName).update({ 
-            status: "Finalizat", 
-            progres: Math.round((total/correctAnswers.length)*100), 
-            scor: total + "/" + correctAnswers.length 
-        });
-        alert("Rezultat salvat!");
-    }
-</script>
-</body>
-</html>
+    // 1. AUTENTIFICARE ANONIMĂ (Necesară pentru reguli private)
+    firebase.auth().signInAnonymously().then(() => {
+        document.getElementById('student-name-display').innerText = "Elev: " + studentName;
