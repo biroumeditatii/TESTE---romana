@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Atelier de Literatura - Harap-Alb</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root { --bg-color: #f8fafc; --card-bg: #ffffff; --primary: #4f46e5; --success: #10b981; --accent: #f1f5f9; }
@@ -31,7 +34,7 @@
 <div class="app-container">
     <header>
         <h1>Evaluare: Povestea lui Harap-Alb</h1>
-        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: Se încarcă...</span>
+        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: Se securizează...</span>
     </header>
     <div class="progress-container">
         <div class="progress-bar-bg"><div id="progress-fill"></div></div>
@@ -60,21 +63,30 @@
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    document.getElementById('student-name-display').innerText = "Elev: " + studentName;
 
-    database.ref('setari').on('value', snap => {
-        const d = snap.val();
-        if (!d || d.test_activ === false || d.test_id !== "test1.html") {
-            window.location.href = 'index.html';
-        }
-    });
-
-    database.ref('clasa/' + studentName).update({
-        nume: studentName, status: "În lucru", test_id: "test1.html", test_nume: "Harap-Alb"
-    }).then(() => {
-        database.ref('clasa/' + studentName).on('value', snap => {
-            if (!snap.exists()) { window.location.href = 'index.html'; }
+    // 1. AUTENTIFICARE ANONIMĂ (Necesară pentru reguli auth != null)
+    firebase.auth().signInAnonymously().then(() => {
+        document.getElementById('student-name-display').innerText = "Elev: " + studentName;
+        
+        // 2. MONITORIZARE LIVE (Lansare/Oprire Test)
+        database.ref('setari').on('value', snap => {
+            const d = snap.val();
+            if (!d || d.test_activ === false || d.test_id !== "test1.html") {
+                window.location.href = 'index.html';
+            }
         });
+
+        // 3. ÎNREGISTRARE ELEV ȘI MONITORIZARE ȘTERGERE
+        database.ref('clasa/' + studentName).update({
+            nume: studentName, status: "În lucru", test_id: "test1.html", test_nume: "Harap-Alb"
+        }).then(() => {
+            database.ref('clasa/' + studentName).on('value', snap => {
+                if (!snap.exists()) { window.location.href = 'index.html'; }
+            });
+        });
+    }).catch(err => {
+        alert("Eroare de conexiune securizată!");
+        window.location.href = 'index.html';
     });
 
     const rawText = `<b>Introducere</b>
@@ -115,6 +127,7 @@
     let correctAnswers = [];
     function normalize(t) { if(!t) return ""; return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ț/g, "t").replace(/ș/g, "s").replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"'„”«»]/g, "").replace(/\s{2,}/g," ").toLowerCase().trim(); }
     function isAnswerCorrect(u, c) { let nU = normalize(u); if (nU === "") return false; if (c.includes('/')) { let p = c.split('/'); return p.some(x => normalize(x) === nU) || nU === normalize(c.replace(/\//g, ', ')); } return nU === normalize(c); }
+    
     function init() {
         const container = document.getElementById('content');
         let i = 0;
@@ -125,6 +138,7 @@
         container.innerHTML = formattedText.replace(/\n/g, '<br>');
         loadSavedProgress();
     }
+
     function updateProgress() {
         const inputs = document.querySelectorAll('.blank-input');
         let correctCount = 0; let answersToSave = [];
@@ -140,6 +154,7 @@
         database.ref('clasa/' + studentName).update({ progres: percent, scor: correctCount + "/" + correctAnswers.length, raspunsuri: answersToSave });
         sessionStorage.setItem('elev_raspunsuri_t1', JSON.stringify(answersToSave));
     }
+
     function loadSavedProgress() {
         const saved = sessionStorage.getItem('elev_raspunsuri_t1');
         if (saved) {
@@ -149,7 +164,9 @@
             updateProgress(); 
         }
     }
+
     function resetTest() { if (confirm("Resetezi?")) { sessionStorage.removeItem('elev_raspunsuri_t1'); location.reload(); } }
+    
     function finalCheck() {
         const inputs = document.querySelectorAll('.blank-input');
         let total = 0;
