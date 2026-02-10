@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Atelier de Literatura - O scrisoare pierdută</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root { --bg-color: #f8fafc; --card-bg: #ffffff; --primary: #4f46e5; --success: #10b981; --accent: #f1f5f9; }
@@ -31,7 +34,7 @@
 <div class="app-container">
     <header>
         <h1>Evaluare: O scrisoare pierdută</h1>
-        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: Se încarcă...</span>
+        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: Se securizează...</span>
     </header>
     <div class="progress-container">
         <div class="progress-bar-bg"><div id="progress-fill"></div></div>
@@ -60,11 +63,35 @@
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    document.getElementById('student-name-display').innerText = "Elev: " + studentName;
+
+    // 1. AUTENTIFICARE ANONIMĂ (Necesară pentru reguli private)
+    firebase.auth().signInAnonymously().then(() => {
+        document.getElementById('student-name-display').innerText = "Elev: " + studentName;
+        
+        // 2. MONITORIZARE LIVE (Lansare/Oprire Test)
+        database.ref('setari').on('value', snap => {
+            const d = snap.val();
+            if (!d || d.test_activ === false || d.test_id !== "test4.html") {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // 3. ÎNREGISTRARE ȘI MONITORIZARE ȘTERGERE
+        database.ref('clasa/' + studentName).update({
+            nume: studentName, status: "În lucru", test_id: "test4.html", test_nume: "O scrisoare pierdută"
+        }).then(() => {
+            database.ref('clasa/' + studentName).on('value', snap => {
+                if (!snap.exists()) { window.location.href = 'index.html'; }
+            });
+        });
+    }).catch(err => {
+        alert("Eroare de conexiune securizată!");
+        window.location.href = 'index.html';
+    });
 
     const rawText = `<b>Reper 1</b>
     Destinul şi [modernizarea] literaturii române au fost marcate în [perioada Marilor Clasici] de personalitatea lui Titu Maiorescu, mentorul [„Junimii”]. Denumirea are atât semnificația de [„adepți ai clasicismului”], dar şi de [„modele”], căci adoptând acest program estetic, reprezentanții epocii devin [repere]: pentru [proza realistă, Ioan Slavici, pentru basmul cult, Ion Creangă, pentru opera dramatică, Ion Luca Caragiale și pentru lirica romantică, Mihai Eminescu].
-    „Comedie [realistă] de moravuri”, așa cum o definea [Titu Maiorescu], opera lui I.L.Caragiale dezvăluie contrastul dintre ceea ce vor să pară personajele și ceea ce sunt ele cu adevărat/ esență și aparență, impresionând prin faptul că întâmplările [veridice] se desfașoară în fața cititorului devenit spectator, prin toponimul [București]. In plus, coordonata realistă este observabilă prin [raportarea] individului la societate/ prin [condiționarea socială] și prin decuparea unor [„felii din viața”] personajelor care se încadrează în tipologii [verosimile]. Piesa este inspirată de un eveniment din actualitatea vremii: în 1883 au avut loc [alegeri pentru Adunarea Constituantă, în scopul alcătuirii unei noi Camere a Deputaţilor], ceea ce accentuează caracterul său [mimetic]/[mimesisul].
+    „Comedie [realistă] de moravuri”, așa cum o definelea [Titu Maiorescu], opera lui I.L.Caragiale dezvăluie contrastul dintre ceea ce vor să pară personajele și ceea ce sunt ele cu adevărat/ esență și aparență, impresionând prin faptul că întâmplările [veridice] se desfașoară în fața cititorului devenit spectator, prin toponimul [București]. In plus, coordonata realistă este observabilă prin [raportarea] individului la societate/ prin [condiționarea socială] și prin decuparea unor [„felii din viața”] personajelor care se încadrează în tipologii [verosimile]. Piesa este inspirată de un eveniment din actualitatea vremii: în 1883 au avut loc [alegeri pentru Adunarea Constituantă, în scopul alcătuirii unei noi Camere a Deputaţilor], ceea ce accentuează caracterul său [mimetic]/[mimesisul].
 
     <b>Reper 2</b>
     Termenul [„dramaturgie”] provine din limba franceză și desemnează operele cu formă [dialogată], asociate cu formă ale spectacolului de teatru, destinate a fi [reprezentate pe scenă].
@@ -76,7 +103,7 @@
     Se remarcă și un al doilea episod semnificativ: secvența în care conținutul biletului de amor este redat de Trahanache prefectului este semnificativă pentru comicul de [tipuri], căci Tipătescu este [prietenul cel mai bun al prezidentului], și în același timp, [amantul soției] lui. Originalitatea scenei demonstrează utilizarea unei [tehnici] moderne, [„teatrul în teatru”], căci prezidentul joacă rolul de [soț naiv], care crede că totul este o „plastografie”, o [imitație] de scrisoare. Calmul lui Tipătescu se transformă în pierderea rațiunii dezvăluind un Tipătescu [vulcanic]: [„Îl împușc! Îi dau foc!”]. Limbajul folosit în scrisoarea adresată Zoei accentueaza ridicolul: [„Nu mă aştepta şi vino tu la cocoşelul tău, care te adoră, ca totdeauna, şi te sărută de o mie de ori, Fănică”].
 
     <b>Reper 4</b>
-    Titlul [analitic], tematic, propune un substantiv [articulat cu articol] nehotărât „o scrisoare” care [generalizează] moravurile societății. La început scrisoarea este expresia unui [sentiment intim]. Pe măsură ce acțiunea înaintează, ea își asociază noi semnificații. Va însemna [dorința] de a doborî un [adversary] politic „mișel”, va însemna șansa unei [ascensiuni] politice rapide, prin [șantaj], va fi simbolul [puterii]. Documentul îi servește lui Caragiale la ridicarea [măștilor] eroilor săi, pentru a-i înfățișa lectorului în [goliciunea] lor sufletească. Se ilustrează o teză a autorului care afirma că [„nimic nu arde mai rău pe ticăloşi”] decât râsul.
+    Titlul [analitic], tematic, propune un substantiv [articulat cu articol] nehotărât „o scrisoare” care [generalizează] moravurile societății. La început scrisoarea este expresia unui [sentiment intim]. Pe măsură ce acțiunea înaintează, ea își asociază noi semnificații. Va însemna [dorința] de a doborî un [adversary] politic „mișel”, va însemna șansa unei [ascensiuni] politice rapide, prin [șantaj], va fi simbolul [puterii]. Documentul îi servește lui Caragiale la ridicarea [măștilor] eroilor săi, pentru au îi înfățișa lectorului în [goliciunea] lor sufletească. Se ilustrează o teză a autorului care afirma că [„nimic nu arde mai rău pe ticăloşi”] decât râsul.
 
     <b>Reper 5</b>
     Acţiunea piesei este divizată după regulile [clasice] în [4] acte, evidențiindu-se [simetria] celui de-al doilea cu al patrulea prin numărul de scene: [9, 14, 7, 14], suma lor fiind [44]. Conflictele sunt de natură [exterioară].
@@ -93,12 +120,11 @@
     <b>Personajele</b>
     Personajele, instanțe fundamentale în textul epic, [„ființe de hârtie”], sunt surprinse în dimensiunea lor [exterioară], neînțelegerile dintre ele duc la naşterea unor noi centre de [conflict]. În studiul dedicat comediilor, [T. Maiorescu] observa că în spatele [„oricărei comedii se ascunde o tragedie”]. Firul evenimentelor scoate la lumină un șir nesfârșit al [defectelor] omenești. În această comedie niciun [personaj pozitiv] nu luminează scena. Astfel, criticul [Eugen Lovinescu] susține că teatrul lui Caragiale [„e întristător ca un spital de infirmități morale”].
     Protagoniștii se subordonează unor [tipuri comice]: Tipătescu este tipul [amantului], Zoe ilustrează [cocheta] şi adulterina, Cațavencu, [politicianul] corupt, Dandanache, politicianul [ticălos]. Aceste tipologii sunt puse în lumină de [numele] expresive. Dandanache intră în bucluc ([dandana]), Trahanache este ușor de manipulat ([„trahanaua”]), sufixul [„-ache”] accentuând [mediocritatea] lor. Farfuridi și Brânzovenescu prin aspectul [culinary] sugerează perfecta [complementaritate].
-    Ştefan Tipătescu are statut social de [prefect], fiind fixat într-un [triunghi conjugal] imoral, bănuit de toţi şi transformat în [obiect de şantaj]. Din punct de vedere [moral], este o fire autoritară, administrează judeţul ca pe [propria moşie]. El dispune [arestarea] lui Cațavencu. Ştefan Tipătescu este îmbătat de [sentimental] propriei importanţe, aşa cum reiese din scena din [incipitul] piesei.
+    Ştefan Tipătescu are statut social de [prefect], fiind fixat într-un [triunghi conjugal] imoral, bănuit de toţi şi transformat în [objiect de şantaj]. Din punct de vedere [moral], este o fire autoritară, administrează judeţul ca pe [propria moşie]. El dispune [arestarea] lui Cațavencu. Ştefan Tipătescu este îmbătat de [sentimental] propriei importanţe, aşa cum reiese din scena din [incipitul] piesei.
     Caracterizarea [indirectă] se realizează prin gesturi şi comportament. Didascaliile îl prezintă [violent] şi impulsiv. Celelalte personaje îl caracterizează în mod [direct]: Zaharia Trahanache consideră că [„E băiat bun”], Nae Caţavencu îl consideră imoral în [Răcnetul Carpaţilor], ziar în care prefectul este numit [„vampir”]. Numele îl fixează în banalitate – „tip” se asociază cu sufixul comun [„-escu”], iar Ștefan ajunge în viața intimă [Fănică].`;
 
     let correctAnswers = [];
 
-    // FUNCȚIA NORMALIZE (IGNORĂ PUNCTUAȚIA, GHILIMELELE ȘI DIACRITICELE)
     function normalize(t) { 
         if(!t) return "";
         return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -107,16 +133,12 @@
                 .replace(/\s{2,}/g," ").toLowerCase().trim(); 
     }
 
-    // LOGICA FLEXIBILĂ PENTRU SLASH /
-    function isAnswerCorrect(userVal, correctVal) {
-        let normUser = normalize(userVal);
-        if (normUser === "") return false;
-        if (correctVal.includes('/')) {
-            let parts = correctVal.split('/');
-            let normParts = parts.map(p => normalize(p));
-            return normParts.includes(normUser) || normUser === normalize(correctVal.replace(/\//g, ', '));
+    function isAnswerCorrect(u, c) {
+        let nU = normalize(u); if (nU === "") return false;
+        if (c.includes('/')) {
+            let p = c.split('/'); return p.some(x => normalize(x) === nU) || nU === normalize(c.replace(/\//g, ', '));
         }
-        return normUser === normalize(correctVal);
+        return nU === normalize(c);
     }
 
     function init() {
@@ -142,7 +164,7 @@
         const percent = Math.round((correctCount / correctAnswers.length) * 100);
         document.getElementById('progress-fill').style.width = percent + "%";
         document.getElementById('progress-text').innerText = percent + "%";
-        database.ref('clasa/' + studentName).set({ nume: studentName, progres: percent, scor: correctCount + "/" + correctAnswers.length, status: "În lucru", raspunsuri: answersToSave, test_id: "test4.html", test_nume: "O scrisoare pierdută" });
+        database.ref('clasa/' + studentName).update({ progres: percent, scor: correctCount + "/" + correctAnswers.length, raspunsuri: answersToSave });
         sessionStorage.setItem('elev_raspunsuri_t4', JSON.stringify(answersToSave));
     }
 
@@ -162,11 +184,7 @@
         const inputs = document.querySelectorAll('.blank-input');
         let total = 0;
         inputs.forEach((input, idx) => { if (isAnswerCorrect(input.value, correctAnswers[idx])) total++; });
-        database.ref('clasa/' + studentName).update({ 
-            status: "Finalizat", 
-            progres: Math.round((total/correctAnswers.length)*100), 
-            scor: total + "/" + correctAnswers.length 
-        });
+        database.ref('clasa/' + studentName).update({ status: "Finalizat", progres: Math.round((total/correctAnswers.length)*100), scor: total + "/" + correctAnswers.length });
         alert("Rezultat salvat!");
     }
 </script>
