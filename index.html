@@ -2,18 +2,17 @@
 <html lang="ro">
 <head>
     <link rel="manifest" href="manifest.json">
-
     <meta name="theme-color" content="#4f46e5">
     <meta name="mobile-web-app-capable" content="yes">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atelier de Literatură - Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
     <style>
         :root {
             --bg-color: #f8fafc;
@@ -116,28 +115,32 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Ascultăm schimbările de la profesor
-    database.ref('setari').on('value', (snapshot) => {
-        const data = snapshot.val();
+    // --- PASUL ESENȚIAL: Autentificare Anonimă pentru acces privat ---
+    firebase.auth().signInAnonymously().then(() => {
+        console.log("Conectat la server.");
         
-        if (data && data.test_activ) {
-            // Testul este pornit
-            document.getElementById('status-title').innerText = "Test Disponibil!";
-            document.getElementById('status-desc').innerText = "Test activ: " + data.test_nume + ". Apasă butonul de mai jos pentru a începe.";
-            document.getElementById('loading-spinner').style.display = 'none';
-            document.getElementById('start-btn').style.display = 'inline-block';
+        // Ascultăm schimbările de la profesor DOAR după ce s-a realizat autentificarea
+        database.ref('setari').on('value', (snapshot) => {
+            const data = snapshot.val();
             
-            // Salvăm ID-ul testului ales de profesor în memorie pentru login.html
-            localStorage.setItem('current_test_file', data.test_id);
-        } else {
-            // Testul este oprit
-            document.getElementById('status-title').innerText = "Sala de Așteptare";
-            document.getElementById('status-desc').innerText = "Te rugăm să aștepți ca profesorul să dea startul testului.";
-            document.getElementById('loading-spinner').style.display = 'block';
-            document.getElementById('start-btn').style.display = 'none';
-        }
+            if (data && data.test_activ) {
+                document.getElementById('status-title').innerText = "Test Disponibil!";
+                document.getElementById('status-desc').innerText = "Test activ: " + data.test_nume + ". Apasă butonul de mai jos pentru a începe.";
+                document.getElementById('loading-spinner').style.display = 'none';
+                document.getElementById('start-btn').style.display = 'inline-block';
+                localStorage.setItem('current_test_file', data.test_id);
+            } else {
+                document.getElementById('status-title').innerText = "Sala de Așteptare";
+                document.getElementById('status-desc').innerText = "Te rugăm să aștepți ca profesorul să dea startul testului.";
+                document.getElementById('loading-spinner').style.display = 'block';
+                document.getElementById('start-btn').style.display = 'none';
+            }
+        });
+    }).catch((error) => {
+        document.getElementById('status-title').innerText = "Eroare de conexiune";
+        document.getElementById('status-desc').innerText = "Nu s-a putut securiza conexiunea cu serverul. Te rugăm să reîncarci pagina.";
+        console.error("Auth error:", error.message);
     });
 </script>
 </body>
 </html>
-
