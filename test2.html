@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Atelier de Literatura - Moara cu noroc</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root { --bg-color: #f8fafc; --card-bg: #ffffff; --primary: #4f46e5; --success: #10b981; --accent: #f1f5f9; }
@@ -31,7 +34,7 @@
 <div class="app-container">
     <header>
         <h1>Evaluare: Moara cu noroc</h1>
-        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: Se încarcă...</span>
+        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: Se securizează...</span>
     </header>
     <div class="progress-container">
         <div class="progress-bar-bg"><div id="progress-fill"></div></div>
@@ -60,7 +63,31 @@
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    document.getElementById('student-name-display').innerText = "Elev: " + studentName;
+
+    // 1. AUTENTIFICARE ANONIMĂ
+    firebase.auth().signInAnonymously().then(() => {
+        document.getElementById('student-name-display').innerText = "Elev: " + studentName;
+
+        // 2. MONITORIZARE LIVE (Lansare/Oprire Test)
+        database.ref('setari').on('value', snap => {
+            const d = snap.val();
+            if (!d || d.test_activ === false || d.test_id !== "test2.html") {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // 3. ÎNREGISTRARE ȘI MONITORIZARE ȘTERGERE
+        database.ref('clasa/' + studentName).update({
+            nume: studentName, status: "În lucru", test_id: "test2.html", test_nume: "Moara cu noroc"
+        }).then(() => {
+            database.ref('clasa/' + studentName).on('value', snap => {
+                if (!snap.exists()) { window.location.href = 'index.html'; }
+            });
+        });
+    }).catch(err => {
+        alert("Eroare de securitate!");
+        window.location.href = 'index.html';
+    });
 
     const rawText = `<b>Reper 1</b>
     Destinul şi [modernizarea] literaturii române au fost marcate în perioada [Marilor Clasici] de personalitatea lui [Titu Maiorescu], mentorul „[Junimii]”. Denumirea are atât semnificația de „[adepți ai clasicismului]”, dar şi de „[modele]”, căci adoptând acest program estetic, reprezentanții epocіі devin [repere]: pentru proza realistă, [Ioan Slavici], pentru basmul cult, [Ion Creangă], pentru opera dramatică, [Ion Luca Caragiale] şi pentru lirica romantică, [Mihai Eminescu].
@@ -73,42 +100,23 @@
     O secvență narativă relevantă pentru această tema complexă o constituie cea dintâi [confruntare dramatică] a lui Ghiță cu Sămădăul. Limbajul devine modalitatea de caracterizare a personajelor implicate în acest [conflict exterior], un război al nervilor, al rezistenței, al vulnerabilităților. [Lică] este [aspru, viclean] şi vrea să se impună ca [unic stăpân al locurilor], iar Ghiță este [dârz și motivat], superior fizic lui Lică. Ana intuieşte că Sămădăul este un „om rău şi primejdios”, iar soțul ei înţelege că „[la Moara cu noroc, nu putea să steie nimeni fără voia lui Lică]” şi ii devine [tovarăş], condiţionat de [împrejurări]. Intuind patima pentru bani a lui Ghiţă, Sămădăul îi dă de înţeles că [șederea la Moara cu noroc depinde numai de bunul său plac]: „Eu voiesc să ştiu cine umblă pe drum, cine trece pe aici… Cred că ne-am înţeles?!” Scena este esențială pentru stabilirea relației [călău-victimă]: Sămădăul se impune şi anulează orice încercare a cârciumarului de a opune rezistenţă.
     Se remarcă şi un al doilea episod semnificativ care pune în lumina cealaltă componentă a tematicii: [deznodământul] ce aduce cu sine rezolvarea conflictelor prin moartea eroilor, ca în [tragedia antică]. Atras în [jocul porcarului], după ce fusese dominat de dorința de a strânge bani, după ce acceptase înțelegeri rușinoase, legate de [crimă], doar pentru a-şi atinge țelul, banii, după ce [mințise] şi se înstrăinase de familie, de soție, crezând că așa o apără, Ghiță ajunge pe cea mai de jos [trepta a degradării morale], asemănătoare unei [coborârii în infern], ad inferos. Fericirea şi liniştea familiei de la început sunt înlocuite [teamă, de suferință morală]. În absența unei comunicări autentice, Ana crede că [soțul n-o mai iubește] şi-l acceptă pe Sămădău, motiv pentru care va plăti cu viața. Roata destinului începe [să macine familia], Ghiță cade şi el victimă [oamenilor lui Lică], pentru vina de [a fi dorit prea mult]. Lică, orgolios, se sinucide. Intrate sub semnul [fatalității oarbe], personajele care alcătuiesc [triunghiul de forță] al textului trec marginile rațiunii şi cunosc, astfel, [moartea în lanț].. Hanul, așezat simbolic la [hotarul dintre Bine și Rău] este purificat prin [foc], imaginea finală fiind de o cromatică simbolică: [oasele albe care ies din cenușa neagră].
     <b>Reper 3</b>
-    Titlul nominal dirijează cititorul spre un sens simbolic, profund, cel al [morii care „macină” destine], conturând, in mod ironic prin cuvântul „[noroc]” un spațiu [malefic]. Univers [unei noi șanse], el este, în esență/în realitate, [aducător de ghinion]. Structura sa [analitică] propune douã substantive, cel articulat [unicizează negativ locul] bântuit, în care diavolul ispitește drumețul, spre deosebire de [hanul lui Sadoveanu], loc al prieteniei şi al abundenței.
+    Titlul nominal dirijează cititorul spre un sens simbolic, profund, cel al [morii care „macină” destine], conturând, in mod ironic prin cuvântul „[noroc]” un spațiu [malefic]. Univers [unei noi șanse], el este, în esență/în realitate, [adocător de ghinion]. Structura sa [analitică] propune douã substantive, cel articulat [unicizează negativ locul] bântuit, în care diavolul ispitește drumețul, spre deosebire de [hanul lui Sadoveanu], loc al prieteniei şi al abundenței.
     Viziunea [moralizatoare] a autorului ilustrează o teză enunțată la începutul nuvelei, prin intervenția [bătrânei]: [măsura în toate]. Motivele literare anticipeazã cursul evenimentelor, „[noaptea]”, „[rãsãritul]”, căci toate evenimentele importante, moartea vãduvei, arestarea lui Ghiţã, [au loc în aceste intervale de timp].
     Narațiunea la [persoana a III-a] este desfășurată [cronologic], prin [înlănțuirea] secvențelor epice, fiind [dramatizată prin dialogul] ce dinamizează întâmplările, susține [evoluția acțiunii] şi caracterizează [personajele]. Instanța epică este [omniscientă], omniprezentă, demiurgică, iar tehnica esențială de a povesti este [cronologia]. Evenimentele se derulează de-a lungul celor [17] capitole, aflate în „[rama]” cugetărilor bătrânei. O metodă narativă ce pledează pentru originalitatea artei scriitorului este [contrapunctul]. Secvenței intrării în [biserică] a celor cu frica lui Dumnezeu în ziua de [Paște] îi corespunde cea în [care, la Moara cu noroc începe] veselia „fără frâu” a celor care au [uitat de Divinitate]. Diegeza este dinamică, fiind întreruptă de analiză trăirilor interioare ale lui Ghiță, ca în orice text [psihologic]. Timpul/Cronosul întâmplărilor este încadrat intre [Sfântul Gheorghe și până la Paște], fără să fie, însă, precizat anul.
-    Conceptia realistă a autorului despre nuvelă, înțeleasă ca un corp geometric perfect „[corp sferoid]” se reflectă în structura sa [circulară]. Incipitul şi finalul sunt simetric-întregitoare în discurs. Începutul nuvelei are valoare [oraculară/premonitorie/ de anticipare]: bătrâna consideră că [provocarea destinului atrage pedepse grave]. Replicile ei sunt expresia [experienţă de viaţã], au legătura cu vechea concepție românească a condiției umane în univers, cu îndemnul [la echilibru], cu ideea de soartă/destin/[predestinare], :,,[Omul sa fie mulțumit cu sărăcia sa…nu bogăția, ci liniștea colibei tale te face fericit]".
+    Conceptia realistă a autorului despre nuvelă, înțeleasă ca un corp geometric perfect „[corp sferoid]” se reflectă în structura sa [circulară]. Incipitul şi finalul sunt simetric-întregitoare în discurs. Începutul nuvelei are valoare [oraculară/premonitorie/ de anticipare]: bătrâna consideră că [provocarea destinului atrage pedepse grave]. Replicile ei sunt experienţa de viaţã, au legătura cu vechea concepție românească a condiției umane în univers, cu îndemnul [la echilibru], cu ideea de soartă/destin/[predestinare], :,,[Omul sa fie mulțumit cu sărăcia sa…nu bogăția, ci liniștea colibei tale te face fericit]".
     Finalul închis aparține tot [bătrânei], personaj-[reflector], ce comunică intenția [moralizatoare] a autorului: „Simțeam eu [nu are să iasă bine]; dar așa le-a fost dat!" Se sugerează faptul că o forță [supranaturală] decide [totul dinainte], că omul va fi pedepsit dacă [încalcă normele morale]. Este exact ceea ce se întâmplă Anei, lui Ghiță şi lui Lică. imaginea [focului purificator] din [epilogul] nuvelei sugerează faptul că totul este pregătit [pentru un nou început], cu alți actori: „[Apoi ea luă copiii și plecă mai departe]".
     Personajele, [instanțe fundamentale] în textul epic, „[ființe de hârtie]”, așa cum le definește [teoria literară], se grupează în pozitive şi negative, principale şi secundare, „[plate” și “rotunde]”, construcţia lor realizându-se prin asocierea a două dimensiuni: [o dimensiune exterioară, alta interioară]. Ghiță, Ana, bătrâna sunt [verosimili], creați după modelul esteticii realiste. Doar Lică, reprezentând răul din societate, un personaj [demonic], are în construcția sa si elemente de factura [romantică].
     Ghiță, în calitatea lui de personaj care [polarizează interesul epic], întruchipează intențiile [realist-moralizatoare] ale autorului. El este tipic pentru categoria socialã în care se încadreazã: [arivistul, dornicul de îmbogățire rapidă]. Devenirea sa tragică ilustrează căderea dinspre [omul moral, pater familias], spre cel [dilematic], luptând cu sinele şi cu Lică, până la cel [imoral], în scena omorârii Anei. Cel care poartă numele [Sfântului Gheorghe] este un antierou [învins de „balaur”].
     Portretul fizic al protagonistului este [sumar], schiţat din câteva linii. Naratorul îl caracterizează în mod direct: „[puternic și umeros ca un taur]”. Există, în nuvelă, şi un portret (idilic) al familiei perfecte: „[Ana era tânără și frumoasa, (…), iar el însuși, înalt și spătos, o purta ca pe o pană]".
     Evoluția psihologică a personajului Ghiță are un traseu [gradual/gradat], conturat indirect prin [comportament]. El trece prin stări succesive de [căutări], de [întrebări] şi de [temeri], implicand când [oameni legii], judecătorul şi jandarmul, când [Divinitatea]. La nivel moral, eroul pendulează între credinta sa creștină şi [patima banului], trăind cu certitudinea că [omul e supus] destinului, prin urmare face ceea ce i-a fost dat.
     UN ELEMENT DE MODERNITATE ESTE [pluriperspectiva/tehnica oglinzilor paralele/tehnica cercurilor concentrice]. Ana remarcă relaţia de [subordonare] şi [inferioritatea] lui Ghiţă. Soacra il considera [responsabil], Lică il vede ca pe un [subordonat], fără voință.
-    8. În concluzie, “Moara cu noroc” este o nuvelã psihologicã şi realistã, care prezintã [dezumanizarea, decãderea spiritualã şi moralã], dar şi viziunea moralizatoare a autorului, evidenţiatã de afirmaţia criticului [Tudor Vianu], „[tot ce iese din limitele moralului sfârşeşte tragic]”.
+    8. În concluzie, “Moara cu noroc” este o nuvelã psihologicã şi realistã, care prezintã [dezumanizarea, decãderea spiritualã şi moralã], dar şi viziunea moralizatoare a autorului, evidenţiatã de afirmaţia criticului [Tudor Vianu], „[tot ce este din limitele moralului sfârşeşte tragic]”.
     Relaţia sa cu Lică este decisivă, deoarece Sămădăul îi află slăbiciunile şi le exploatează. Pentru prima dată în literatura română este urmărit raportul existenţial „[călău – victimă]”. Treptat, setea de bani pune stăpânire pe mintea şi pe acţiunile lui Ghiţă. El se înstrăinează de Ana şi de copii, iar naratorul urmăreşte detaliat [zbuciumul sufletesc, alunecarea acestuia în obsesie]. Dacă Lică se înscrie în tipologia [parvenitului], Ghiţă se înscrie în tipul omului [ezitant].
     Portretul fizic al lui Lică, [anatagonistul], este detaliat, simbol al maleficului: „[un om de 36 de ani, înalt, uscãţiv şi supt la faţã, cu mustaţã lungã, cu ochii mici şi verzi]”. Poziția socialã de „[sămădău]”, dovedește puterea de a controla şi de a manipula. Trãsãturile care îl definesc cel mai bine pe Licã sunt [brutalitatea, viclenia, rãutatea], dar şi inteligenţa. Finalul lui Licã ilustrează [pedeapsa divinã] („[Acu’ m-a ajuns mânia lui Dumnezeu!]”). Astfel, Licã Sãmãdãul devine un simbol pentru proverbul „[Dupã faptã şi rãsplatã]”.`;
 
     let correctAnswers = [];
-
-    // FUNCȚIA NORMALIZE (CURĂȚĂ PUNCTUAȚIA ȘI GHILIMELELE)
-    function normalize(t) { 
-        if(!t) return "";
-        return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/ț/g, "t").replace(/ș/g, "s")
-                .replace(/[.,#!$%\^&\*;:{}=\-_`~()"'„”«»]/g, "") 
-                .replace(/\s{2,}/g," ").toLowerCase().trim(); 
-    }
-
-    // VERIFICARE VARIANTĂ SLASH
-    function isAnswerCorrect(userVal, correctVal) {
-        let normUser = normalize(userVal);
-        if (normUser === "") return false;
-        if (correctVal.includes('/')) {
-            let parts = correctVal.split('/');
-            let normParts = parts.map(p => normalize(p));
-            return normParts.includes(normUser) || normUser === normalize(correctVal.replace(/\//g, ', '));
-        }
-        return normUser === normalize(correctVal);
-    }
+    function normalize(t) { if(!t) return ""; return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ț/g, "t").replace(/ș/g, "s").replace(/[.,#!$%\^&\*;:{}=\-_`~()"'„”«»]/g, "").replace(/\s{2,}/g," ").toLowerCase().trim(); }
+    function isAnswerCorrect(u, c) { let nU = normalize(u); if (nU === "") return false; if (c.includes('/')) { let p = c.split('/'); return p.some(x => normalize(x) === nU) || nU === normalize(c.replace(/\//g, ', ')); } return nU === normalize(c); }
 
     function init() {
         const container = document.getElementById('content');
@@ -133,9 +141,8 @@
         const percent = Math.round((correctCount / correctAnswers.length) * 100);
         document.getElementById('progress-fill').style.width = percent + "%";
         document.getElementById('progress-text').innerText = percent + "%";
-        database.ref('clasa/' + studentName).set({ 
-            nume: studentName, progres: percent, scor: correctCount + "/" + correctAnswers.length, 
-            status: "În lucru", raspunsuri: answersToSave, test_id: "test2.html", test_nume: "Moara cu noroc" 
+        database.ref('clasa/' + studentName).update({ 
+            progres: percent, scor: correctCount + "/" + correctAnswers.length, raspunsuri: answersToSave 
         });
         sessionStorage.setItem('elev_raspunsuri_t2', JSON.stringify(answersToSave));
     }
@@ -157,11 +164,9 @@
         let total = 0;
         inputs.forEach((input, idx) => { if (isAnswerCorrect(input.value, correctAnswers[idx])) total++; });
         database.ref('clasa/' + studentName).update({ 
-            status: "Finalizat", 
-            progres: Math.round((total/correctAnswers.length)*100), 
-            scor: total + "/" + correctAnswers.length 
+            status: "Finalizat", progres: Math.round((total/correctAnswers.length)*100), scor: total + "/" + correctAnswers.length 
         });
-        alert("Rezultat final: " + total + "/" + correctAnswers.length);
+        alert("Rezultat finalizat: " + total + "/" + correctAnswers.length);
     }
 </script>
 </body>
