@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Atelier de Literatura - Corola de minuni a lumii</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-color: #f8fafc; --card-bg: #ffffff; --primary: #4f46e5; --success: #10b981; --accent: #f1f5f9; }
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+        html, body { overscroll-behavior: none; user-select: none; -webkit-user-select: none; background-color: var(--bg-color); font-family: 'Inter', sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 900px; background: var(--card-bg); padding: 40px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); }
+        header { text-align: center; margin-bottom: 40px; border-bottom: 1px solid var(--accent); padding-bottom: 20px; }
+        h1 { font-size: 1.8rem; color: var(--primary); margin: 0; }
+        .progress-container { margin-bottom: 30px; display: flex; align-items: center; gap: 15px; }
+        .progress-bar-bg { flex-grow: 1; height: 12px; background: var(--accent); border-radius: 10px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background-color: #ef4444; border-radius: 10px; transition: width 0.5s ease; }
+        .content-area { font-family: 'Merriweather', serif; line-height: 2.2; font-size: 1.1rem; color: #334155; text-align: justify; }
+        .blank-input { font-family: 'Inter', sans-serif; border: none; border-bottom: 2px solid #cbd5e1; background-color: #f8fafc; padding: 2px 6px; font-size: 1rem; font-weight: 600; color: var(--primary); width: 180px; outline: none; text-align: center; border-radius: 4px; }
+        .input-number { font-size: 0.7rem; font-weight: 700; color: #94a3b8; margin-right: 2px; vertical-align: super; }
+        .actions { margin-top: 50px; display: flex; justify-content: center; gap: 15px; }
+        .btn { padding: 14px 28px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; border: none; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-secondary { background-color: var(--accent); color: #64748b; }
+        b { color: var(--primary); display: block; margin-top: 25px; font-size: 1.4rem; border-bottom: 2px solid var(--accent); }
+    </style>
+</head>
+<body onload="init()">
+<div class="app-container">
+    <header>
+        <h1>Evaluare: Corola de minuni a lumii</h1>
+        <span id="student-name-display" style="font-weight:600; color:var(--primary);">Elev: Se încarcă...</span>
+    </header>
+    <div class="progress-container">
+        <div class="progress-bar-bg"><div id="progress-fill"></div></div>
+        <span id="progress-text" style="font-size:0.9rem; font-weight:600;">0%</span>
+    </div>
+    <div id="content" class="content-area"></div>
+    <div class="actions">
+        <button class="btn btn-primary" onclick="finalCheck()">Finalizează</button>
+        <button class="btn btn-secondary" onclick="resetTest()">Resetează</button>
+    </div>
+</div>
+
+<script>
+    let studentName = localStorage.getItem('elev_nume');
+    if (!studentName) { window.location.href = 'index.html'; }
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2xOfKBy7FdA6uIyM0ij5ryHTop0yL3pg",
+      authDomain: "bacromana-6f3eb.firebaseapp.com",
+      databaseURL: "https://bacromana-6f3eb-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "bacromana-6f3eb",
+      storageBucket: "bacromana-6f3eb.firebasestorage.app",
+      messagingSenderId: "1087294677634",
+      appId: "1:1087294677634:web:d92bf75a8b58f7b351ca9b"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    document.getElementById('student-name-display').innerText = "Elev: " + studentName;
+
+    // 1. MONITORIZARE STARE TEST (Redirecționare live)
+    database.ref('setari').on('value', snap => {
+        const d = snap.val();
+        if (!d || d.test_activ === false || d.test_id !== "test6.html") {
+            window.location.href = 'index.html';
+        }
+    });
+
+    // 2. ÎNREGISTRARE ȘI MONITORIZARE ȘTERGERE
+    database.ref('clasa/' + studentName).update({
+        nume: studentName, status: "În lucru", test_id: "test6.html", test_nume: "Corola de minuni a lumii"
+    }).then(() => {
+        database.ref('clasa/' + studentName).on('value', snap => {
+            if (!snap.exists()) { window.location.href = 'index.html'; }
+        });
+    });
+
+    const rawText = `<b>Reper</b> 
+    Perioada [interbelică] a reprezentat al [doilea] moment estetic de vârf din evoluția literaturii naționale, după epoca [Marilor Clasici], concentrând prozatori remarcabili, poeți și dramaturgi.
+    Intreaga generație de scriitori s-a aflat sub semnul [înnoirii] literare, iniţiate de [Eugen Lovinescu].
+    Criticul de la „[Sburătorul]” porneşte de la ideea că există un [spirit al veacului] care impune procesul de [modernizare] a literaturii române, fiind adeptul [teoriei imitației] și al [principiului sincronismului].
+    Astfel, prin [simulare] și [stimulare], prin [adoptarea] și [adaptarea] modelelor se remarcă o [dezvoltare] a literaturii care în scurt timp atinge nivelul valoric [occidental].
+    Definit prin ruptura de [tradiție], modernismul blagian reprezintă [noul], schimbarea, originalitatea, iar componenta tematică este preferința pentru [cunoaștere].
+    Revoluționând [structura] poetică, Lucian Blaga caută in textele sale lirice soluții de ieșire din tiparele [prozodice] tradiționale și propune un [nou] model, bazat pe versuri [inegale] ca măsură, cu rimă [albă].
+    Poezia se caracterizează prin [discurs] liber, prin tehnica [ingambamentului], prin [dislocări] sintactice, prin metaforizare [excesivă], prin construcții [oximoronicice], ce creează ambiguitatea limbajului.
+
+    <b>Reper</b> 
+    Lucian Blaga este unul dintre creatorii români [interbelici] care a reusit sa dea un sens înalt iubirii și gândirii [filozofice] prin volumele de poezii, prin trilogii și prin opera dramatică „[Meşterul Manole]”. Volumul „[Poemele luminii]”, aparut in [1919], este deschis de poezia „Eu nu strivesc corola de minuni a lumii”, si defineste perfect concepția originală a lui Blaga despre destin și cunoastere, într-un lung limbaj literar care-l particularizează.
+    Creația literară este o [artă poetică] modernistă despre relația [poet-lume] și [poet-creație], iar poziția ei privilegiată îi demonstrează statutul de text [programmatic], cheie de interpretare a unui univers liric filozofic.
+
+    <b>Reper</b> 
+    Dominanta tematică se configurează pe două dimensiuni: cunoașterea [luciferică] a lumii este posibilă numai prin iubire, iar cunoașterea [paradisiacă] distruge Creația.
+    Astfel, [două] planuri se află în [contrast]: cel al cunoașterii „luciferice”, totale, poetice, [plus-cunoaștere] și cel al cunoașterii „[paradisiace]”, raționale, [antipoetice], minus-cunoaștere.
+    Încă din incipit se ilustrează superioritatea eului liric, care optează pentru „[lumina mea]”, în opoziție cu „[lumina altora]” care aleg calea paradisiacă.
+    La nivel compozițional, discursul poetic de tip [argumentative] se concentrează într-o [singură] strofă polimorfă, de [douăzeci] de versuri, cu măsură [inconstanta].
+    Cele [patru] secvențe au centrul de iradiere a semnificației în metafora [luminii], simbol al cunoașterii.
+    Prima secvență, însumând [cinci] versuri, pune în evidență cea dintai componentă tematică, acentuând relația eu-univers enunțată metaforic în titlu.
+    Se figurează o călătorie inițiatică, pentru că în „[calea]” sa, poetul are revelația miracolului [vieții] și a misterului [morții] pe care nu încearcă să le destrame: „Eu nu strivesc corola de minuni a lumii / și nu ucid / cu mintea tainele ce le-ntâlnesc / în calea mea”.
+    Fragmentele- [petale] ale acestui univers sunt legate prin misterioase [corespondențe], sugerate la nivel textual prin coordonarea termenilor [enumerației] „în flori, în ochi, pe buze ori morminte”.
+    „[Florile]” sugerează mirabila frumusețe a naturii, a universului nu doar vegetal, fiindcă definesc și [nașterea], copilăria, dar și taina [înfloririi], a rodirii.
+    Motivul „[ochilor]” simbolizând pământul însuși care își deschide privirea pretutindeni se asociază firesc ideii de [cunoaștere] a lumii înconjurătoare, dar și conceptului de „oglindă a sufletului”, a universului interior.
+    „[Buzele]” înseamnă rostire, cuvânt poetic, iubire, [sărut]. „[Mormintele]” pot fi simboluri ale mineralului, țărâna, dar [tradiția], păstrarea legăturii spirituale cu strămoșii.
+    Deci, [patru] termeni devin metafore ale [Nașterii], ale [Cunoașterii], ale [Logosului], ale [Erosului] dar și ale [Thanatosului].
+    Ordinea lor nu este întâmplătoare, fiind asociate într-o gradație ascendentă și urmărind procesul [vieții] și al [morții], încheierea unui [ciclu] existenţial şi revenirea la terestru.
+    Ca taine întâlnite în cale și ocrotite prin iubire, cele patru fragmente ale unui Tot armonic îmbogățesc „vraja nepătrunsului ascuns”.
+    Secvența a [doua], alcătuită din [trei] versuri detaliază cealaltă componentă a [temei], un alt mod de cunoaștere: cea rațională, numită de Blaga „[cunoaștere paradisiacă]”, figurată poetic prin metafora „lumina [altora]” în care pronumele nehotărât „[altora]” desemnează mulțimea celor care aleg calea [minus-cunoașterii].
+    Dacă prima secvență evidenția prezența verbelor la forma [negative] „nu strivesc”, „nu ucid cu mintea”, prin dubla negație primind o semnificație [pozitivă] „nu strivesc”=ocrotesc, „nu ucid cu mintea”=protejez, amplific, a doua secvență exprimă contrariul printr-un verb la forma [afirmativă]: „Lumina altora / sugrumă vraja nepătrunsului ascuns”, „sugrumă”=ucide taina.
+
+    <b>Reper</b> 
+    La nivelul relațiilor de opoziție, textul dezvoltă o [antiteză] între „lumina altora” și „lumina mea”, în care alternanța „[mea]”, ca unicitate a eului liric se opune „[altora]”, echivalent al mediocritatii celor din jur.
+    Se supramarchează/ marcheaza o data in plus la nivelul persoanei gramaticale a pronumelor de persoana [I] / a [III]-a contrastul fundamental al poeziei.
+    Se remarca [simetria] dintre secvența [întâi] și [ultima], cu valoare de [concluzie], subliniată prin conjunctia „[căci]”, echivalenta cu „[deci]”.
+    Iubirea devine, astfel, instrument de cunoaștere, calea descifrării tainelor lumii.
+    Prin recurenta enumerației „si [flori, si ochi, si buze sau morminte]”, „corola de minuni a lumii” pare a se închide [sferic], refăcându-și [perfecțiunea].
+
+    <b>Reper</b> 
+    Titlul este un element paratextual, care, prin structură [analitică] de enunț [propozițional], devine o cheie de lectură și deschide [universal] de semnificatii al textului liric.
+    El se constituie într-unul de tip „[interior]”, find chiar [incipitul], primul vers al poeziei.
+    Substantivul comun articulat cu articolul hotărât „[corolla]” oferă universului o reprezentare [sferică], de o fragilă armonie, definită prin ideea de miracol.
+    Eul poetic se raporteaza la această lume prin verbul la [prezent], forma negativă „[nu strives]”, ce evidențiază atitudinea sa [protectoare] fata de Univers.`;
+
+    let correctAnswers = [];
+    function normalize(t) { if(!t) return ""; return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ț/g, "t").replace(/ș/g, "s").replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"'„”«»]/g, "").replace(/\s{2,}/g," ").toLowerCase().trim(); }
+    function isAnswerCorrect(u, c) { let nU = normalize(u); if (nU === "") return false; if (c.includes('/')) { let p = c.split('/'); return p.some(x => normalize(x) === nU) || nU === normalize(c.replace(/\//g, ', ')); } return nU === normalize(c); }
+
+    function init() {
+        const container = document.getElementById('content');
+        let i = 0;
+        const formattedText = rawText.replace(/\[(.*?)\]/g, (match, word) => {
+            correctAnswers.push(word.trim());
+            return `<span class="input-number">${i + 1}</span><input type="text" class="blank-input" data-index="${i++}" oninput="updateProgress()">`;
+        });
+        container.innerHTML = formattedText.replace(/\n/g, '<br>');
+        loadSavedProgress();
+    }
+
+    function updateProgress() {
+        const inputs = document.querySelectorAll('.blank-input');
+        let correctCount = 0; let answersToSave = [];
+        inputs.forEach((input, idx) => {
+            answersToSave.push(input.value); 
+            if (isAnswerCorrect(input.value, correctAnswers[idx])) {
+                correctCount++; input.style.color = "#10b981"; input.style.borderBottomColor = "#10b981";
+            } else { input.style.color = "#4f46e5"; input.style.borderBottomColor = "#cbd5e1"; }
+        });
+        const percent = Math.round((correctCount / correctAnswers.length) * 100);
+        document.getElementById('progress-fill').style.width = percent + "%";
+        document.getElementById('progress-text').innerText = percent + "%";
+        database.ref('clasa/' + studentName).update({ progres: percent, scor: correctCount + "/" + correctAnswers.length, raspunsuri: answersToSave });
+        sessionStorage.setItem('elev_raspunsuri_t6', JSON.stringify(answersToSave));
+    }
+
+    function loadSavedProgress() {
+        const saved = sessionStorage.getItem('elev_raspunsuri_t6');
+        if (saved) {
+            const answers = JSON.parse(saved);
+            const inputs = document.querySelectorAll('.blank-input');
+            inputs.forEach((input, idx) => { if (answers[idx]) input.value = answers[idx]; });
+            updateProgress(); 
+        }
+    }
+
+    function resetTest() { if (confirm("Resetezi?")) { sessionStorage.removeItem('elev_raspunsuri_t6'); location.reload(); } }
+    function finalCheck() {
+        const inputs = document.querySelectorAll('.blank-input');
+        let total = 0;
+        inputs.forEach((input, idx) => { if (isAnswerCorrect(input.value, correctAnswers[idx])) total++; });
+        database.ref('clasa/' + studentName).update({ status: "Finalizat", progres: Math.round((total/correctAnswers.length)*100), scor: total + "/" + correctAnswers.length });
+        alert("Rezultat salvat!");
+    }
+</script>
+</body>
+</html>
