@@ -2,20 +2,23 @@
 <html lang="ro">
 <head>
     <link rel="manifest" href="manifest.json">
-
     <meta name="theme-color" content="#4f46e5">
     <meta name="mobile-web-app-capable" content="yes">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <meta charset="UTF-8"><title>Identificare</title>
+    <meta charset="UTF-8">
+    <title>Identificare</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
     <style>
         body { font-family: 'Inter', sans-serif; background: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .card { background: white; padding: 40px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 350px; text-align: center; }
         input { width: 100%; padding: 12px; margin: 20px 0; border: 2px solid #e2e8f0; border-radius: 10px; outline: none; text-align: center; font-size: 1rem; }
         button { background: #4f46e5; color: white; border: none; padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.2s; }
         button:hover { background: #4338ca; }
+        .status-msg { font-size: 0.7rem; color: #94a3b8; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -23,10 +26,35 @@
         <h2>Cine ești?</h2>
         <p style="color: #64748b; font-size: 0.9rem;">Introdu numele tău pentru a începe testul.</p>
         <input type="text" id="nume-elev" placeholder="Nume și Prenume">
-        <button onclick="intraInTest()">ÎNCEPE TESTUL</button>
+        <button id="btn-start" onclick="intraInTest()">ÎNCEPE TESTUL</button>
+        <div id="auth-status" class="status-msg">Se securizează conexiunea...</div>
     </div>
 
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC2xOfKBy7FdA6uIyM0ij5ryHTop0yL3pg",
+            authDomain: "bacromana-6f3eb.firebaseapp.com",
+            databaseURL: "https://bacromana-6f3eb-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "bacromana-6f3eb",
+            storageBucket: "bacromana-6f3eb.firebasestorage.app",
+            messagingSenderId: "1087294677634",
+            appId: "1:1087294677634:web:d92bf75a8b58f7b351ca9b"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        // Autentificare imediată pentru a avea acces la regulile private
+        firebase.auth().signInAnonymously()
+            .then(() => {
+                document.getElementById('auth-status').innerText = "Conexiune securizată.";
+                document.getElementById('auth-status').style.color = "#10b981";
+            })
+            .catch((error) => {
+                console.error("Auth error:", error.message);
+                document.getElementById('auth-status').innerText = "Eroare de securitate. Reîncărcați pagina.";
+                document.getElementById('auth-status').style.color = "#ef4444";
+            });
+
         function intraInTest() {
             const numeNou = document.getElementById('nume-elev').value.trim();
             if (numeNou.length < 3) return alert("Introdu un nume valid!");
@@ -34,20 +62,22 @@
             // Verificăm cine a fost logat ultima dată pe această tabletă
             const numeVechi = localStorage.getItem('elev_nume');
 
-            // DACĂ numele este diferit, înseamnă că e un elev nou.
-            // Ștergem răspunsurile vechi din memorie pentru a-i da o foaie goală.
+            // Dacă este un elev nou, curățăm progresul anterior
             if (numeVechi && numeVechi !== numeNou) {
                 localStorage.removeItem('elev_raspunsuri');
+                // Curățăm și cheile specifice fiecărui test
+                for(let i=1; i<=6; i++) {
+                    sessionStorage.removeItem('elev_raspunsuri_t' + i);
+                }
             }
 
             // Salvăm noul nume
             localStorage.setItem('elev_nume', numeNou);
             
-            // Redirecționăm către testul activat de profesor
+            // Redirecționăm către testul activat de profesor (salvat de index.html în localStorage)
             const targetTest = localStorage.getItem('current_test_file') || 'test1.html';
             window.location.href = targetTest;
         }
     </script>
 </body>
-
 </html>
